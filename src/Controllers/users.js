@@ -13,6 +13,25 @@ router.post('/users', async (req, res) => {
   }
 });
 
+router.post('users/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+      return res.status(400).send({ error: 'Invalid email or password' });
+    }
+
+    if (!(password == usuario.password)) {
+      return res.status(400).send({ error: 'Invalid email or password' });
+    }
+
+    res.send({ user: usuario });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 // Obter todos os usuários
 router.get('/users', async (req, res) => {
   try {
