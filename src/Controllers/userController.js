@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../Models/userSchema');
+const bcrypt = require('bcrypt');
+
+// const chave = "HSUQWHUIH"
+const salt = bcrypt.genSaltSync();
 
 const signUp = async (req, res) => {
   try {
     const user = new User(req.body);
+    user.password = bcrypt.hashSync(user.password, salt)
     await user.save();
     res.status(201).send(user);
   } catch (error) {
@@ -20,14 +25,12 @@ const login = async (req, res) => {
 
     if (!user) {
       return res.status(400).send({ error: 'Invalid email or password' });
-    } else {
-      if(user.password != password){
+    } else if(!bcrypt.compareSync(password, user.password)){
         return res.status(400).send({ error: 'Invalid email or password' });
-      }
-      return res.status(200).send(user);
     }
-
-    res.send({ user: user });
+    
+    return res.status(200).send(user);
+    // res.send({ user: user });
   } catch (error) {
     res.status(500).send(error);
   }
