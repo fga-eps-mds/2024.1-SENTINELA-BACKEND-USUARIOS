@@ -1,22 +1,38 @@
 version: '3.8'
 services:
-  mongo:
-    image: mongo:latest
-    container_name: mongo
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
     ports:
       - "27017:27017"
+    env_file: .env
     volumes:
       - mongo-data:/data/db
+    networks:
+      - backend_network
+    command: ["mongod", "--quiet", "--logpath", "/dev/null"]
 
-  express:
+  express_backend:
     build: .
-    container_name: express
+    container_name: express_backend_users
     ports:
-      - "3000:3000"
+      - "3001:3001"
+    env_file: .env
     environment:
-      MONGO_URI: mongodb://mongo:27017/sentinela-users
+      MONGO_URI: ${MONGO_URI}
     depends_on:
-      - mongo
+      - mongodb
+    networks:
+      - backend_network
+    volumes:
+      - ./:/app
 
 volumes:
   mongo-data:
+
+networks:
+  backend_network:
