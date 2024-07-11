@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require('../Models/userSchema');
 const bcrypt = require('bcrypt');
 
-// const chave = "HSUQWHUIH"
 const salt = bcrypt.genSaltSync();
 
 const signUp = async (req, res) => {
