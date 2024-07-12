@@ -15,4 +15,3 @@ yarn-error.log
 # Arquivos de configuração de IDEs
 .idea
 .vscode
-.env
