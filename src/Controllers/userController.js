@@ -1,7 +1,8 @@
-const express = require('express');
-const router = express.Router();
 const User = require('../Models/userSchema');
 const bcrypt = require('bcrypt');
+const { generateToken } = require('../Utils/token');
+const { sendEmail } = require('../Utils/email');
+const generator = require('generate-password');
 
 const salt = bcrypt.genSaltSync();
 
@@ -23,13 +24,17 @@ const login = async (req, res) => {
     const user = await User.findOne({ email: email });
 
     if (!user) {
-      return res.status(400).send({ error: 'Invalid email or password' });
-    } else if(!bcrypt.compareSync(password, user.password)){
-        return res.status(400).send({ error: 'Invalid email or password' });
+      return res.status(400).send({ error: 'Email ou senha inválidos.' });
+    } else if (!bcrypt.compareSync(password, user.password)) {
+      return res.status(400).send({ error: 'Email ou senha inválidos.' });
     }
-    
-    return res.status(200).send(user);
-    // res.send({ user: user });
+
+    const token = generateToken(user._id)
+
+    return res.status(200).json({
+      token,
+      user
+    });
   } catch (error) {
     res.status(500).send(error);
   }
@@ -57,10 +62,18 @@ const getUserById = async (req, res) => {
 };
 
 const patchUser = async (req, res) => {
+  const userId = req.params.id;
+
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!user) {
       return res.status(404).send();
+    }
+
+    if(userId !== req.userId) {
+      return res.status(403).json({
+        mensagem: 'O token fornecido não tem permissão para finalizar a operação'
+      })
     }
 
     user.updatedAt = new Date();
@@ -85,11 +98,81 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const recoverPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+    }
+
+    // // Gerar token com expiração curta (1 hora)
+    // const token = generateToken(user._id); // caso precise...
+
+    const temp_pass = generator.generate({
+      length: 6,
+      numbers: true
+    })
+
+    user.password = bcrypt.hashSync(temp_pass, salt)
+
+    await user.save()
+
+    const bodyEmail = `
+        Sua nova senha temporária é:
+        <br />
+        ${temp_pass}
+      `;
+    const sended = await sendEmail(user.email, 'Redefinição de senha', bodyEmail);
+
+    if (!sended) {
+      return res.json({ mensagem: 'Falha ao enviar email.' });
+    }
+
+    return res.json({ mensagem: 'Email enviado com instruções para redefinir sua senha.' });
+  } catch (error) {
+    console.error('Erro ao solicitar redefinição de senha:', error);
+    return res.status(500).json({ mensagem: 'Erro interno ao processar solicitação.' });
+  }
+};
+
+const changePassword = async (req, res) => {
+  const { new_password } = req.body;
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).send();
+    }
+
+    if(userId !== req.userId) {
+      return res.status(403).json({
+        mensagem: 'O token fornecido não tem permissão para finalizar a operação'
+      })
+    }
+
+    user.password = bcrypt.hashSync(new_password, salt)
+    await user.save()
+
+    return res.status(200).json({
+      mensagem: "senha alterada com sucesso."
+    });
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+}
+
+
 module.exports = {
   signUp,
   login,
   getUsers,
   getUserById,
   deleteUser,
-  patchUser
+  patchUser,
+  recoverPassword,
+  changePassword
 };
