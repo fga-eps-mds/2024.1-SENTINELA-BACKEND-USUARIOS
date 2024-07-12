@@ -1,4 +1,4 @@
-# Issue: closes: #X
+# Issue: closes: #
 
 ## descrição
 
