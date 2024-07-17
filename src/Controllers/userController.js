@@ -1,4 +1,6 @@
 const User = require('../Models/userSchema');
+const Role = require('../Models/roleSchema');
+
 const bcrypt = require('bcrypt');
 const { generateToken } = require('../Utils/token');
 const { sendEmail } = require('../Utils/email');
@@ -9,8 +11,27 @@ const salt = bcrypt.genSaltSync();
 const signUp = async (req, res) => {
   try {
     const user = new User(req.body);
-    user.password = bcrypt.hashSync(user.password, salt)
+
+    const temp_pass = generator.generate({
+      length: 8,
+      numbers: true
+    })
+
+    user.password = bcrypt.hashSync(temp_pass, salt)
+
     await user.save();
+
+    const bodyEmail = `
+        Bem vindo a equipe Sentinela, sua senha temporária é:
+        <br />
+        ${temp_pass}
+      `;
+    const sended = await sendEmail(user.email, 'Acesso a plataforma Sentinela', bodyEmail);
+
+    if (!sended) {
+      return res.json({ mensagem: 'Falha ao enviar email.' });
+    }
+
     res.status(201).send(user);
   } catch (error) {
     res.status(400).send(error);
@@ -70,7 +91,7 @@ const patchUser = async (req, res) => {
       return res.status(404).send();
     }
 
-    if(userId !== req.userId) {
+    if (userId !== req.userId) {
       return res.status(403).json({
         mensagem: 'O token fornecido não tem permissão para finalizar a operação'
       })
@@ -139,7 +160,7 @@ const recoverPassword = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
-  const { new_password } = req.body;
+  const { old_password, new_password } = req.body;
   const userId = req.params.id;
 
   try {
@@ -148,9 +169,15 @@ const changePassword = async (req, res) => {
       return res.status(404).send();
     }
 
-    if(userId !== req.userId) {
+    if (userId !== req.userId) {
       return res.status(403).json({
         mensagem: 'O token fornecido não tem permissão para finalizar a operação'
+      })
+    }
+
+    if (!bcrypt.compareSync(old_password, user.password)) {
+      return res.status(401).json({
+        mensagem: 'Senha atual incorreta.'
       })
     }
 
@@ -165,6 +192,28 @@ const changePassword = async (req, res) => {
   }
 }
 
+const hasPermission = async (req, res) => {
+  const userId = req.params.id;
+  const { moduleName, action } = req.query; // Parâmetros na URL
+
+  try {
+    const user = await User.findById(userId).populate('role');
+    if (!user || !user.role) {
+      return res.status(404).json({ message: 'User or role not found' });
+    }
+
+    const role = user.role;
+    const permission = role.permissions.find(p => p.module === moduleName);
+
+    if (permission && permission.access.includes(action)) {
+      return res.status(200).json({ hasPermission: true });
+    } else {
+      return res.status(403).json({ hasPermission: false });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
 
 module.exports = {
   signUp,
@@ -174,5 +223,6 @@ module.exports = {
   deleteUser,
   patchUser,
   recoverPassword,
-  changePassword
+  changePassword,
+  hasPermission
 };

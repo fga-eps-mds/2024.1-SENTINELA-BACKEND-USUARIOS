@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Role = require('./roleSchema');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -8,14 +9,19 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    immutable: true
+    immutable: true,
+    unique: true
   },
-  celular: {
+  phone: {
     type: String,
     required: true
   },
   password: {
     type: String,
+  },
+  role: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Role',
     required: true
   },
   createdAt: {
@@ -26,6 +32,20 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+});
+
+userSchema.set('toJSON', {
+  transform: (doc, ret, options) => {
+    delete ret.password;
+    return ret;
+  }
+});
+
+userSchema.set('toObject', {
+  transform: (doc, ret, options) => {
+    delete ret.password;
+    return ret;
+  }
 });
 
 const User = mongoose.model('User', userSchema);
