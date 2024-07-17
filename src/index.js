@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const routes = require('./routes');
 const app = express();
-const initialize = require('./Utils/initDatabase');
 const initializeRoles = require('./Utils/initDatabase');
 
 const {
@@ -27,29 +26,28 @@ app.use(cors(corsOption));
 // Middleware para parsear JSON
 app.use(bodyParser.json());
 
+console.log(NODE_ENV)
+
 //
 let url;
-if(NODE_ENV === "development") {
+if(NODE_ENV === "development" || NODE_ENV === "test") {
   url = MONGO_URI;
 } else {
   url = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${DB_HOST}/`;
 }
 
-// Conect to MongoB
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(async () => {
+const startServer = async () => {
+  try {
+    // Conectar ao MongoDB
+    await mongoose.connect(url);
     console.log('Connected to MongoDB');
 
-    // Inicializar roles
-    await initializeRoles();
-    console.log('Roles initialized');
-
-    // rotas
+    // Configurar rotas
     app.use('/', routes);
 
-    // Rota de teste
-    app.get('/', (req, res) => {
-      res.send('Hello, world!');
+    // Endpoint para verificar se o servidor está pronto
+    app.get('/ready', (req, res) => {
+      res.sendStatus(200);
     });
 
     // Iniciar o servidor
@@ -57,10 +55,15 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
       console.log(`Server running on port ${PORT}`);
       console.log('NODE_ENV:', NODE_ENV);
     });
-  })
-  .catch(err => {
-    console.error('Error connecting to MongoDB', err);
+  } catch (err) {
+    console.error('Error connecting to MongoDB or initializing roles', err);
     process.exit(1);
-  });
+  }
+};
 
-module.exports = app;
+// Para desenvolvimento e execução normal
+if (NODE_ENV !== "test") {
+  startServer();
+}
+
+module.exports = {app, startServer};

@@ -20,5 +20,9 @@ $ sudo docker-compose down --volumes
 
 ```
 $ sudo docker-compose rm -f
+
 ```
 
+## Rodar teste dentro do container
+
+docker exec -it express_backend_users npm test

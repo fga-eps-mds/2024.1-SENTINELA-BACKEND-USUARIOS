@@ -1,10 +1,10 @@
 Copie esse conteúdo para um .env
 
 NODE_ENV=development
-MONGO_URI=mongodb://root:password@mongodb:27017/
+MONGO_URI=mongodb://root:password@userdb:27017/
 MONGO_INITDB_ROOT_USERNAME=root
 MONGO_INITDB_ROOT_PASSWORD=password
-DB_HOST=mongodb
+DB_HOST=userdb
 PORT=3001
 # host=
 EMAIL= sentinela@email.com
