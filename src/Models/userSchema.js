@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
     ref: 'Role',
     required: true
   },
+  status: {
+    type: Boolean,
+    default: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

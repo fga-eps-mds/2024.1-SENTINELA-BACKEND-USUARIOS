@@ -4,7 +4,14 @@ FROM node:20
 # Diretório de trabalho
 WORKDIR /app
 
+# Copia apenas o package.json e package-lock.json para aproveitar o cache do Docker
+COPY package*.json ./
+
+# Instala as dependências
+RUN npm ci
+
+# Copia o restante do código
 COPY . .
 
 # Comando para iniciar o servidor
-CMD ["sh", "-c", "npm install && npm start"]
+CMD ["npm", "start"]
