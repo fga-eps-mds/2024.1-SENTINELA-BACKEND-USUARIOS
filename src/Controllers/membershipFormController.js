@@ -27,7 +27,7 @@ const createMembershipForm = async (req, res) => {
             return res.status(400).json({ erro: "Naturalidade deve ser uma string" });
         }
         const ufsValidos = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
-        if (!ufsValidos.includes(req.body.uf)) {
+        if (!ufsValidos.includes(req.body.uf_naturalidade)) {
             return res.status(400).json({ erro: "UF inválida" });
         }
         const estadosCivisValidos = ['Solteiro', 'Casado', 'Separado', 'Viúvo'];
