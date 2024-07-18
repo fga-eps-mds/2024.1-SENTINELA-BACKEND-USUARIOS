@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const dependentSchema = require('./dependentSchema');
 
 const membershipFormSchema = new mongoose.Schema({ // estou fazendoo um novo schema no meu banco de daods 
 
@@ -139,6 +140,7 @@ uf_naturalidade: {
     enum: ['Ativo', 'Inativo']
   },
   dependentes: [dependentSchema],
+
 
 
 
