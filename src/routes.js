@@ -2,7 +2,7 @@ const express = require('express');
 const routes = express.Router();
 const UserController = require('./Controllers/userController');
 const { tokenValidation } = require('./Utils/token');
-const { route } = require('.');
+const MembershipForm = require('./Controllers/membershipFormController');
 
 // Private
 routes.get('/users', UserController.getUsers);
@@ -15,5 +15,6 @@ routes.patch('/users/change-password/:id', tokenValidation, UserController.chang
 routes.post('/signup', UserController.signUp);
 routes.post('/login', UserController.login);
 routes.post('/users/recover-password', UserController.recoverPassword);
-
+routes.post('/membership/create', MembershipForm.createMembershipForm);
+routes.get('/membership', MembershipForm.getMembershipForm);
 module.exports = routes;
