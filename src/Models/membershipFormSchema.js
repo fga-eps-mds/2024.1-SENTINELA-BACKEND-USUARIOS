@@ -68,7 +68,7 @@ uf_naturalidade: {
     // enum: []
   },
   cpf: {
-    type: Number,
+    type: String,
     required: true,
     unique: true
     // immutable: true

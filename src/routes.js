@@ -17,4 +17,5 @@ routes.post('/login', UserController.login);
 routes.post('/users/recover-password', UserController.recoverPassword);
 routes.post('/membership/create', MembershipForm.createMembershipForm);
 routes.get('/membership', MembershipForm.getMembershipForm);
+routes.delete('/membership/delete/:id', MembershipForm.deleteMembershipForm);
 module.exports = routes;
