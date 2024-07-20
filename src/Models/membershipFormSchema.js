@@ -93,7 +93,8 @@ uf_naturalidade: {
   },
   lotacao: {
     type: String,
-    required: true
+    required: true,
+    enum: ['Sede', 'Interior']
   },
   cep: {
     type: Number,
