@@ -11,7 +11,6 @@ routes.get('/users/:id', tokenValidation,  UserController.getUserById);
 routes.patch('/users/patch/:id', tokenValidation, UserController.patchUser);
 routes.delete('/users/delete/:id', tokenValidation, UserController.deleteUser);
 routes.patch('/users/change-password/:id', tokenValidation, UserController.changePassword);
-
 // --roles
 routes.post('/role/create', tokenValidation, RoleController.createRole);
 routes.get('/role', RoleController.getAllRoles);

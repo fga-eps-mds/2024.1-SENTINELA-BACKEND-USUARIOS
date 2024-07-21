@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema({
     ref: 'Role',
     required: true
   },
+  status: {
+    type: String,
+    enum: ['Ativo', 'Inativo'],
+    default: 'Ativo'
+  },
   createdAt: {
     type: Date,
     default: Date.now
