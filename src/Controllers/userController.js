@@ -15,7 +15,6 @@ const signUp = async (req, res) => {
     const temp_pass = generator.generate({
       length: 8,
       numbers: true,
-      console.log('Senha temporária gerada:', temp_pass)
     })
 
     
