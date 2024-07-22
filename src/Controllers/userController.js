@@ -1,7 +1,7 @@
 const User = require('../Models/userSchema');
 const Role = require('../Models/roleSchema');
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { generateToken } = require('../Utils/token');
 const { sendEmail } = require('../Utils/email');
 const generator = require('generate-password');
@@ -86,21 +86,29 @@ const patchUser = async (req, res) => {
   const userId = req.params.id;
 
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    // Encontre o usuário pelo ID
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).send();
     }
 
-    if (userId !== req.userId) {
+    // Verifique se o usuário tem permissão para atualizar os dados
+    if (userId !== req.token) {
       return res.status(403).json({
         mensagem: 'O token fornecido não tem permissão para finalizar a operação'
-      })
+      });
     }
 
+    // Atualize as propriedades do usuário com os dados fornecidos em req.body
+    Object.assign(user, req.body);
+
+    // Atualize a data de atualização
     user.updatedAt = new Date();
 
+    // Salve as alterações no banco de dados
     await user.save();
 
+    // Envie a resposta com o usuário atualizado
     res.status(200).send(user);
   } catch (error) {
     res.status(400).send(error);
@@ -128,9 +136,6 @@ const recoverPassword = async (req, res) => {
     if (!user) {
       return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
     }
-
-    // // Gerar token com expiração curta (1 hora)
-    // const token = generateToken(user._id); // caso precise...
 
     const temp_pass = generator.generate({
       length: 6,

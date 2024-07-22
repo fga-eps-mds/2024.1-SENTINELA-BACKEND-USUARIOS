@@ -31,6 +31,20 @@ services:
     volumes:
       - ./:/app
 
+  test:
+    build: .
+    container_name: test_backend_users
+    command: ["npm", "run", "test"]
+    env_file: .env
+    volumes:
+      - ./:/app
+    depends_on:
+      - mongodb
+    networks:
+      - backend_network
+    profiles:
+      - testing
+
 volumes:
   mongo-data:
 

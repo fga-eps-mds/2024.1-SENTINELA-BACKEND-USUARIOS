@@ -5,14 +5,13 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.js",
-    "test": "NODE_ENV=test PORT=4001 jest --coverage --forceExit",
-    "docker:test": "docker exec -it express_backend_users npm test"
+    "test": "NODE_ENV=test PORT=4001 jest --coverage --forceExit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.19.2",

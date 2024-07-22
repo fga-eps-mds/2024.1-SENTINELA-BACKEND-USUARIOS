@@ -3,8 +3,9 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const routes = require('./routes');
-const app = express();
 const initializeRoles = require('./Utils/initDatabase');
+
+const app = express();
 
 const {
   NODE_ENV,
@@ -15,22 +16,29 @@ const {
   PORT
 } = process.env;
 
-const corsOption = {
+const corsOptions = {
   origin: ['http://localhost:5173'],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true
-}
+};
+
 // Aplicar o middleware CORS antes das rotas
-app.use(cors(corsOption));
+app.use(cors(corsOptions));
 
-// Middleware para parsear JSON
-app.use(bodyParser.json());
+// Middleware para parsear JSON e dados URL-encoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-console.log(NODE_ENV)
+// Rotas
+app.use('/', routes);
 
-//
+// Endpoint para verificar se o servidor está pronto
+app.get('/', (req, res) => {
+  res.send('Hello, world!');
+});
+
 let url;
-if(NODE_ENV === "development" || NODE_ENV === "test") {
+if (NODE_ENV === "development" || NODE_ENV === "test") {
   url = MONGO_URI;
 } else {
   url = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${DB_HOST}/`;
@@ -42,13 +50,8 @@ const startServer = async () => {
     await mongoose.connect(url);
     console.log('Connected to MongoDB');
 
-    // Configurar rotas
-    app.use('/', routes);
-
-    // Endpoint para verificar se o servidor está pronto
-    app.get('/ready', (req, res) => {
-      res.sendStatus(200);
-    });
+    // Inicializar roles
+    await initializeRoles();
 
     // Iniciar o servidor
     app.listen(PORT, () => {
@@ -66,4 +69,4 @@ if (NODE_ENV !== "test") {
   startServer();
 }
 
-module.exports = {app, startServer};
+module.exports = { app, startServer };
