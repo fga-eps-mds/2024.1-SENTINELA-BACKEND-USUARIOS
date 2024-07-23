@@ -1,14 +1,16 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { app, startServer } = require('../index'); // Ajuste conforme necessário
+const User = require('../Models/userSchema');
 
-let server;
+let createdUserIds = [];
 
 beforeAll(async () => {
-  server = await startServer(); // Inicia o servidor
+  await startServer(); // Inicia o servidor
 });
 
 afterAll(async () => {
+  await User.deleteMany({ _id: { $in: createdUserIds } });
   await mongoose.disconnect();
 });
 
@@ -28,6 +30,7 @@ describe('UserController', () => {
       });
     
     expect(response.status).toBe(201);
+    createdUserIds.push(response.body._id);
   });
 
   it('should log in a user', async () => {
@@ -66,10 +69,10 @@ describe('UserController', () => {
     const response = await request(app)
       .patch(`/users/patch/${userId}`)
       .set('Authorization', `Bearer ${authToken}`)
-      .send({ name: 'John Smith' });
+      .send({ name: 'admin 2' });
     
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('name', 'John Smith');
+    expect(response.body).toHaveProperty('name', 'admin 2');
   });
 
   it('should delete a user', async () => {

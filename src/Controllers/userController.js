@@ -93,8 +93,8 @@ const patchUser = async (req, res) => {
     }
 
     // Verifique se o usuário tem permissão para atualizar os dados
-    if (userId !== req.token) {
-      return res.status(403).json({
+    if (userId !== req.userId) {
+      return res.status(457).json({
         mensagem: 'O token fornecido não tem permissão para finalizar a operação'
       });
     }
