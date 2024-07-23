@@ -97,7 +97,7 @@ uf_naturalidade: {
     enum: ['Sede', 'Interior']
   },
   cep: {
-    type: Number,
+    type: String,
     required: true
   },
   nomeDaMae: {

@@ -1,5 +1,5 @@
 const MembershipForm = require('../Models/membershipFormSchema');
-const { validateFormData } = require('../Utils/validateFormData');
+
 
 const createMembershipForm = async (req, res) => { 
     try {
@@ -20,17 +20,11 @@ const createMembershipForm = async (req, res) => {
             if (existingMembership.cpf === formData.cpf) errorMessage += 'CPF já cadastrado. ';
             if (existingMembership.matricula === formData.matricula) errorMessage += 'Matrícula já cadastrada. ';
             if (existingMembership.email === formData.email) errorMessage += 'Email já cadastrado. ';
+            if (existingMembership.rg === formData.rg) errorMessage += 'RG já cadastrado. ';
             return res.status(400).json({ erro: errorMessage.trim() });
         }
 
-        const validationResponse = validateFormData(formData);
-        if (validationResponse !== true) {
-            return res.status(400).json({ erro: validationResponse });
-        }
-
-        console.log("Validações concluídas com sucesso");
-
-        console.log("Dados antes de salvar:", formData);
+        
         const membership = new MembershipForm(formData);
         await membership.save();
         console.log("Formulário de membro criado com sucesso:", membership);
