@@ -21,7 +21,7 @@ const createMembershipForm = async (req, res) => {
             if (existingMembership.matricula === formData.matricula) errorMessage += 'Matrícula já cadastrada. ';
             if (existingMembership.email === formData.email) errorMessage += 'Email já cadastrado. ';
             if (existingMembership.rg === formData.rg) errorMessage += 'RG já cadastrado. ';
-            return res.status(400).json({ erro: errorMessage.trim() });
+            return res.status(777).json({ erro: errorMessage.trim() });
         }
 
         
@@ -32,7 +32,7 @@ const createMembershipForm = async (req, res) => {
         
     } catch (error) {
         console.error("Erro ao criar formulário de membro:", error);
-        return res.status(400).send({ error: "Erro ao criar formulário de membro" });
+        return res.status(888).send({error});
     }
 };
 
