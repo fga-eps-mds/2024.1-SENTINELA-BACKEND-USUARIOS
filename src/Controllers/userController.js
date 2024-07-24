@@ -88,21 +88,29 @@ const patchUser = async (req, res) => {
   const userId = req.params.id;
 
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    // Encontre o usuário pelo ID
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).send();
     }
 
-    if (userId !== req.userId) {
-      return res.status(403).json({
-        mensagem: 'O token fornecido não tem permissão para finalizar a operação'
-      })
-    }
+    // Verifique se o usuário tem permissão para atualizar os dados
+    // if (userId !== req.userId) {
+    //   return res.status(457).json({
+    //     mensagem: 'O token fornecido não tem permissão para finalizar a operação'
+    //   });
+    // }
 
+    // Atualize as propriedades do usuário com os dados fornecidos em req.body
+    Object.assign(user, req.body.updatedUser);
+    console.log(req.body.updatedUser);
+    // Atualize a data de atualização
     user.updatedAt = new Date();
 
+    // Salve as alterações no banco de dados
     await user.save();
 
+    // Envie a resposta com o usuário atualizado
     res.status(200).send(user);
   } catch (error) {
     res.status(400).send(error);

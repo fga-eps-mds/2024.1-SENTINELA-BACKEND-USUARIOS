@@ -7,9 +7,9 @@ const { tokenValidation } = require('./Utils/token');
 // Private Routes
 // --user
 routes.get('/users', tokenValidation, UserController.getUsers);
-routes.get('/users/:id', UserController.getUserById);
-routes.patch('/users/patch/:id', UserController.patchUser);
-routes.delete('/users/delete/:id', UserController.deleteUser);
+routes.get('/users/:id', tokenValidation,UserController.getUserById);
+routes.patch('/users/patch/:id',tokenValidation, UserController.patchUser);
+routes.delete('/users/delete/:id',tokenValidation, UserController.deleteUser);
 routes.patch('/users/change-password/:id', tokenValidation, UserController.changePassword);
 
 // --roles
