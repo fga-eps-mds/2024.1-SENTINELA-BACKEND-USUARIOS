@@ -11,7 +11,8 @@ const createMembershipForm = async (req, res) => {
             $or: [
                 { cpf: formData.cpf },
                 { matricula: formData.matricula },
-                { email: formData.email }
+                { email: formData.email },
+                { rg: formData.rg }
             ]
         });
 
