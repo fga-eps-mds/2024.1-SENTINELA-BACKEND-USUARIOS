@@ -103,7 +103,6 @@ const patchUser = async (req, res) => {
 
     // Atualize as propriedades do usuário com os dados fornecidos em req.body
     Object.assign(user, req.body.updatedUser);
-    console.log(req.body.updatedUser);
     // Atualize a data de atualização
     user.updatedAt = new Date();
 
