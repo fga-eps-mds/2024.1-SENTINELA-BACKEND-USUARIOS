@@ -7,7 +7,7 @@ yarn-debug.log
 yarn-error.log
 
 # Arquivos de ambiente
-# .env
+.env
 
 # Arquivos de build
 /build
@@ -16,4 +16,4 @@ yarn-error.log
 # Arquivos de configuração de IDEs
 .idea
 .vscode
-.env
+.DS_Store
