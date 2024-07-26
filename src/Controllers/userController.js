@@ -1,10 +1,10 @@
-const User = require('../Models/userSchema');
-const Role = require('../Models/roleSchema');
+const User = require("../Models/userSchema");
+const Role = require("../Models/roleSchema");
 
-const bcrypt = require('bcryptjs');
-const { generateToken } = require('../Utils/token');
-const { sendEmail } = require('../Utils/email');
-const generator = require('generate-password');
+const bcrypt = require("bcryptjs");
+const { generateToken } = require("../Utils/token");
+const { sendEmail } = require("../Utils/email");
+const generator = require("generate-password");
 
 const salt = bcrypt.genSaltSync();
 
@@ -14,10 +14,10 @@ const signUp = async (req, res) => {
 
     const temp_pass = generator.generate({
       length: 8,
-      numbers: true
-    })
+      numbers: true,
+    });
 
-    user.password = bcrypt.hashSync(temp_pass, salt)
+    user.password = bcrypt.hashSync(temp_pass, salt);
 
     await user.save();
 
@@ -26,11 +26,11 @@ const signUp = async (req, res) => {
         <br />
         ${temp_pass}
       `;
-    const sended = await sendEmail(user.email, 'Acesso a plataforma Sentinela', bodyEmail);
+    // const sended = await sendEmail(user.email, 'Acesso a plataforma Sentinela', bodyEmail);
 
-    if (!sended) {
-      return res.json({ mensagem: 'Falha ao enviar email.' });
-    }
+    // if (!sended) {
+    //   return res.json({ mensagem: 'Falha ao enviar email.' });
+    // }
 
     res.status(201).send(user);
   } catch (error) {
@@ -45,16 +45,16 @@ const login = async (req, res) => {
     const user = await User.findOne({ email: email });
 
     if (!user) {
-      return res.status(400).send({ error: 'Email ou senha inválidos.' });
+      return res.status(400).send({ error: "Email ou senha inválidos." });
     } else if (!bcrypt.compareSync(password, user.password)) {
-      return res.status(400).send({ error: 'Email ou senha inválidos.' });
+      return res.status(400).send({ error: "Email ou senha inválidos." });
     }
 
-    const token = generateToken(user._id)
+    const token = generateToken(user._id);
 
     return res.status(200).json({
       token,
-      user
+      user,
     });
   } catch (error) {
     res.status(500).send(error);
@@ -95,7 +95,8 @@ const patchUser = async (req, res) => {
     // Verifique se o usuário tem permissão para atualizar os dados
     if (userId !== req.userId) {
       return res.status(457).json({
-        mensagem: 'O token fornecido não tem permissão para finalizar a operação'
+        mensagem:
+          "O token fornecido não tem permissão para finalizar a operação",
       });
     }
 
@@ -134,33 +135,41 @@ const recoverPassword = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+      return res.status(404).json({ mensagem: "Usuário não encontrado." });
     }
 
     const temp_pass = generator.generate({
       length: 6,
-      numbers: true
-    })
+      numbers: true,
+    });
 
-    user.password = bcrypt.hashSync(temp_pass, salt)
+    user.password = bcrypt.hashSync(temp_pass, salt);
 
-    await user.save()
+    await user.save();
 
     const bodyEmail = `
         Sua nova senha temporária é:
         <br />
         ${temp_pass}
       `;
-    const sended = await sendEmail(user.email, 'Redefinição de senha', bodyEmail);
+    const sended = await sendEmail(
+      user.email,
+      "Redefinição de senha",
+      bodyEmail
+    );
 
     if (!sended) {
-      return res.json({ mensagem: 'Falha ao enviar email.' });
+      return res.json({ mensagem: "Falha ao enviar email." });
     }
 
-    return res.json({ mensagem: 'Email enviado com instruções para redefinir sua senha.' });
+    return res.json({
+      mensagem: "Email enviado com instruções para redefinir sua senha.",
+    });
   } catch (error) {
-    console.error('Erro ao solicitar redefinição de senha:', error);
-    return res.status(500).json({ mensagem: 'Erro interno ao processar solicitação.' });
+    console.error("Erro ao solicitar redefinição de senha:", error);
+    return res
+      .status(500)
+      .json({ mensagem: "Erro interno ao processar solicitação." });
   }
 };
 
@@ -176,39 +185,40 @@ const changePassword = async (req, res) => {
 
     if (userId !== req.userId) {
       return res.status(403).json({
-        mensagem: 'O token fornecido não tem permissão para finalizar a operação'
-      })
+        mensagem:
+          "O token fornecido não tem permissão para finalizar a operação",
+      });
     }
 
     if (!bcrypt.compareSync(old_password, user.password)) {
       return res.status(401).json({
-        mensagem: 'Senha atual incorreta.'
-      })
+        mensagem: "Senha atual incorreta.",
+      });
     }
 
-    user.password = bcrypt.hashSync(new_password, salt)
-    await user.save()
+    user.password = bcrypt.hashSync(new_password, salt);
+    await user.save();
 
     return res.status(200).json({
-      mensagem: "senha alterada com sucesso."
+      mensagem: "senha alterada com sucesso.",
     });
   } catch (error) {
     return res.status(500).send(error);
   }
-}
+};
 
 const hasPermission = async (req, res) => {
   const userId = req.params.id;
   const { moduleName, action } = req.query; // Parâmetros na URL
 
   try {
-    const user = await User.findById(userId).populate('role');
+    const user = await User.findById(userId).populate("role");
     if (!user || !user.role) {
-      return res.status(404).json({ message: 'User or role not found' });
+      return res.status(404).json({ message: "User or role not found" });
     }
 
     const role = user.role;
-    const permission = role.permissions.find(p => p.module === moduleName);
+    const permission = role.permissions.find((p) => p.module === moduleName);
 
     if (permission && permission.access.includes(action)) {
       return res.status(200).json({ hasPermission: true });
@@ -218,7 +228,7 @@ const hasPermission = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-}
+};
 
 module.exports = {
   signUp,
@@ -229,5 +239,5 @@ module.exports = {
   patchUser,
   recoverPassword,
   changePassword,
-  hasPermission
+  hasPermission,
 };

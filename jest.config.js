@@ -1,4 +1,11 @@
+/**
+ * For a detailed explanation regarding each configuration property, visit:
+ * https://jestjs.io/docs/configuration
+ */
+
 /** @type {import('jest').Config} */
+
+const reporter = process.env.JEST_SONAR;
 const config = {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
@@ -7,19 +14,13 @@ const config = {
   // bail: 0,
 
   // The directory where Jest should store its cached dependency information
-  // cacheDirectory: "/tmp/jest_rs",
+  // cacheDirectory: "/private/var/folders/s3/jld0w3ss3txdd8vgp87f13680000gn/T/jest_dx",
 
   // Automatically clear mock calls, instances, contexts and results before every test
   clearMocks: true,
 
-  // Automatically reset mock state before every test
-  resetMocks: true,
-
-  // Automatically restore mock state and implementation before every test
-  restoreMocks: true,
-
   // Indicates whether the coverage information should be collected while executing the test
-  collectCoverage: true,
+  // collectCoverage: false,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   // collectCoverageFrom: undefined,
@@ -35,13 +36,20 @@ const config = {
   // Indicates which provider should be used to instrument code for coverage
   coverageProvider: "v8",
 
+  reporters: reporter
+    ? [
+        [
+          "jest-sonar",
+          {
+            // Directory for the Sonar report
+            outputName: "coverage.xml", // Sonar output file name
+          },
+        ],
+      ]
+    : ["default"],
+
   // A list of reporter names that Jest uses when writing coverage reports
-  // coverageReporters: [
-  //   "json",
-  //   "text",
-  //   "lcov",
-  //   "clover"
-  // ],
+  coverageReporters: ["lcov"],
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,
@@ -69,7 +77,7 @@ const config = {
   // A set of global variables that need to be available in all test environments
   // globals: {},
 
-  // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
+  // The maximum amount of workers used to run your tests. Can be specified as % or a number.
   // maxWorkers: "50%",
 
   // An array of directory names to be searched recursively up from the requiring module's location
@@ -86,7 +94,7 @@ const config = {
   //   "ts",
   //   "tsx",
   //   "json",
-  //   "node"
+  //   "node",
   // ],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
@@ -110,8 +118,17 @@ const config = {
   // Use this configuration option to add custom reporters to Jest
   // reporters: undefined,
 
+  // Automatically reset mock state before every test
+  // resetMocks: false,
+
   // Reset the module registry before running each individual test
   // resetModules: false,
+
+  // A path to a custom resolver
+  // resolver: undefined,
+
+  // Automatically restore mock state and implementation before every test
+  // restoreMocks: false,
 
   // The root directory that Jest should scan for tests and modules within
   // rootDir: undefined,
@@ -169,10 +186,10 @@ const config = {
   // transform: undefined,
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  transformIgnorePatterns: [
-    "/node_modules/",
-    "\\.pnp\\.[^\\/]+$"
-  ],
+  // transformIgnorePatterns: [
+  //   "/node_modules/",
+  //   "\\.pnp\\.[^\\/]+$"
+  // ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,
