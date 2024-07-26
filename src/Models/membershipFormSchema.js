@@ -25,7 +25,7 @@ const membershipFormSchema = new mongoose.Schema({ // estou fazendoo um novo sch
     sexo: {
     type: String,
     required: true,
-    enum: ['Masculino', 'Feminino', 'Outro']
+    enum: ['Masculino', 'Feminino']
 },
 naturalidade: {
     type: String,
@@ -89,7 +89,7 @@ uf_naturalidade: {
   cargo:{
     type: String,
     required: true,
-    enum:['Advogado', 'Agente', 'Outro']
+    
   },
   lotacao: {
     type: String,
@@ -139,6 +139,10 @@ uf_naturalidade: {
     type: String,
     required: true,
     enum: ['Ativo', 'Inativo']
+  },
+  religiao: {
+    type: String,
+    required: true
   },
   dependentes: [dependentSchema],
 

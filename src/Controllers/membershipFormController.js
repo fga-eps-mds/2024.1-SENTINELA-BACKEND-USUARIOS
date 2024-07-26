@@ -22,8 +22,10 @@ const createMembershipForm = async (req, res) => {
             if (existingMembership.matricula === formData.matricula) errorMessage += 'Matrícula já cadastrada. ';
             if (existingMembership.email === formData.email) errorMessage += 'Email já cadastrado. ';
             if (existingMembership.rg === formData.rg) errorMessage += 'RG já cadastrado. ';
+
             return res.status(777).json({ erro: errorMessage.trim() });
         }
+       
 
         
         const membership = new MembershipForm(formData);
