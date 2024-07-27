@@ -1,4 +1,7 @@
-Copie esse conteúdo para um .env
+# Copie esse conteúdo para um .env
+# Lembrete: sempre que adicionar uma variável de ambiente nova,
+# caso ela seja necessária para o ambiente de testes, adicionar também
+# nos arquivos de workflow
 
 NODE_ENV=development
 MONGO_URI=mongodb://root:password@userdb:27017/
