@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const Role = require('../Models/roleSchema'); // Ajuste o caminho conforme necessário
 const User = require('../Models/userSchema');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const salt = bcrypt.genSaltSync();
 

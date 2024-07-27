@@ -1,7 +1,7 @@
 const User = require('../Models/userSchema');
 const Role = require('../Models/roleSchema');
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { generateToken } = require('../Utils/token');
 const { sendEmail } = require('../Utils/email');
 const generator = require('generate-password');

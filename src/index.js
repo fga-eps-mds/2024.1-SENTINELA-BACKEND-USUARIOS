@@ -16,13 +16,12 @@ const {
   PORT
 } = process.env;
 
-const corsOption = {
-  origin: ['http://localhost:5173'],
+const corsOptions = {
+  origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true
-}
+};
 // Aplicar o middleware CORS antes das rotas
-app.use(cors(corsOption));
+app.use(cors(corsOptions));
 
 // Middleware para parsear JSON
 app.use(bodyParser.json());
