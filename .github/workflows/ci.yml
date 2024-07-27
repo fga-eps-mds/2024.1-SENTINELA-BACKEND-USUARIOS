@@ -1,91 +1,91 @@
 name: backend-usuarios-ci
 
 on:
-  push:
-    branches: [main, devel]
-  pull_request:
-    branches:
-      - main
-      - devel
-    types: [opened, synchronize, reopened]
+    push:
+        branches: [main, devel]
+    pull_request:
+        branches:
+            - main
+            - devel
+        types: [opened, synchronize, reopened]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    env:
-      MONGO_URI: ${{ secrets.MONGO_URI }}
-      MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
-      MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
-      DB_HOST: ${{ secrets.DB_HOST }}
-      PORT: ${{ secrets.PORT }}
-      EMAIL: ${{ secrets.EMAIL }}
-      SECRET: ${{ secrets.SECRET }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
-
-      - name: 📬 Caching
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/node_modules
-            ${{ github.workspace }}/dist
-          key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('/.{js,jsx,ts,tsx}') }}
-          restore-keys: |
-            ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-
-
-      - name: 🧰 Instala bibliotecas e dependências
-        run: npm i
-
-      - name: 🧪 Roda suíte de testes
-        run: npm test
-
-  sonarcloud:
-    name: sonarcloud
-    needs: [test]
-    runs-on: ubuntu-latest
-    env:
-      MONGO_URI: ${{ secrets.MONGO_URI }}
-      MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
-      MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
-      DB_HOST: ${{ secrets.DB_HOST }}
-      PORT: ${{ secrets.PORT }}
-      EMAIL: ${{ secrets.EMAIL }}
-      SECRET: ${{ secrets.SECRET }}
-    continue-on-error: true
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: 📬 Caching
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/node_modules
-            ${{ github.workspace }}/dist
-          key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
-          restore-keys: |
-            ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-
-
-      - name: 🧰 Instala bibliotecas e dependências
-        run: npm i
-
-      # todo quando tiver eslint
-      # - name: 📜 Relatório do eslint
-      #   run: npx eslint -f json -o reports/eslint-report.json src || true
-
-      - name: 🧪 Testes e cobertura
-        run: JEST_SONAR=jest-sonar CI=true npm test -- --coverage
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+    test:
+        runs-on: ubuntu-latest
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            MONGO_URI: ${{ secrets.MONGO_URI }}
+            MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
+            MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+            DB_HOST: ${{ secrets.DB_HOST }}
+            PORT: ${{ secrets.PORT }}
+            EMAIL: ${{ secrets.EMAIL }}
+            SECRET: ${{ secrets.SECRET }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Use Node.js 20.x
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20.x
+
+            - name: 📬 Caching
+              uses: actions/cache@v3
+              with:
+                  path: |
+                      ${{ github.workspace }}/node_modules
+                      ${{ github.workspace }}/dist
+                  key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('/.{js,jsx,ts,tsx}') }}
+                  restore-keys: |
+                      ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-
+
+            - name: 🧰 Instala bibliotecas e dependências
+              run: npm i
+
+            - name: 🧪 Roda suíte de testes
+              run: npm test
+
+    sonarcloud:
+        name: sonarcloud
+        needs: [test]
+        runs-on: ubuntu-latest
+        env:
+            MONGO_URI: ${{ secrets.MONGO_URI }}
+            MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
+            MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+            DB_HOST: ${{ secrets.DB_HOST }}
+            PORT: ${{ secrets.PORT }}
+            EMAIL: ${{ secrets.EMAIL }}
+            SECRET: ${{ secrets.SECRET }}
+        continue-on-error: true
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+
+            - name: 📬 Caching
+              uses: actions/cache@v3
+              with:
+                  path: |
+                      ${{ github.workspace }}/node_modules
+                      ${{ github.workspace }}/dist
+                  key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
+                  restore-keys: |
+                      ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-
+
+            - name: 🧰 Instala bibliotecas e dependências
+              run: npm i
+
+            # todo quando tiver eslint
+            # - name: 📜 Relatório do eslint
+            #   run: npx eslint -f json -o reports/eslint-report.json src || true
+
+            - name: 🧪 Testes e cobertura
+              run: JEST_SONAR=jest-sonar CI=true npm test -- --coverage
+
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarcloud-github-action@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

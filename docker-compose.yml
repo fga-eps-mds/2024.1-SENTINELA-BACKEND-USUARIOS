@@ -1,52 +1,52 @@
-version: '3.8'
+version: "3.8"
 services:
-  mongodb:
-    image: mongo:7.0
-    container_name: userdb
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
-    ports:
-      - "27017:27017"
-    env_file: .env
-    volumes:
-      - mongo-data:/data/db
-    networks:
-      - backend_network
-    command: ["mongod", "--quiet", "--logpath", "/dev/null"]
+    mongodb:
+        image: mongo:7.0
+        container_name: userdb
+        restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: password
+        ports:
+            - "27017:27017"
+        env_file: .env
+        volumes:
+            - mongo-data:/data/db
+        networks:
+            - backend_network
+        command: ["mongod", "--quiet", "--logpath", "/dev/null"]
 
-  express_backend:
-    build: .
-    container_name: express_backend_users
-    ports:
-      - "3001:3001"
-    env_file: .env
-    environment:
-      MONGO_URI: ${MONGO_URI}
-    depends_on:
-      - mongodb
-    networks:
-      - backend_network
-    volumes:
-      - ./:/app
+    express_backend:
+        build: .
+        container_name: express_backend_users
+        ports:
+            - "3001:3001"
+        env_file: .env
+        environment:
+            MONGO_URI: ${MONGO_URI}
+        depends_on:
+            - mongodb
+        networks:
+            - backend_network
+        volumes:
+            - ./:/app
 
-  test:
-    build: .
-    container_name: test_backend_users
-    command: ["npm", "run", "test"]
-    env_file: .env
-    volumes:
-      - ./:/app
-    depends_on:
-      - mongodb
-    networks:
-      - backend_network
-    profiles:
-      - testing
+    test:
+        build: .
+        container_name: test_backend_users
+        command: ["npm", "run", "test"]
+        env_file: .env
+        volumes:
+            - ./:/app
+        depends_on:
+            - mongodb
+        networks:
+            - backend_network
+        profiles:
+            - testing
 
 volumes:
-  mongo-data:
+    mongo-data:
 
 networks:
-  backend_network:
+    backend_network:
