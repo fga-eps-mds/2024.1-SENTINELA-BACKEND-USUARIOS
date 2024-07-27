@@ -1,6 +1,4 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
   nomeCompleto: {
@@ -136,9 +134,12 @@ const userSchema = new mongoose.Schema({
     // enum: []
   },
   status: {
-    type: String,
-    enum: ['Ativo', 'Inativo'],
-    default: 'Ativo'
+    type: Boolean,
+    default: true,
+  },
+  role: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Role",
   },
   createdAt: {
     type: Date,
@@ -150,6 +151,20 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const User = mongoose.model('User', userSchema);
+userSchema.set("toJSON", {
+    transform: (doc, ret) => {
+        delete ret.password;
+        return ret;
+    },
+});
+
+userSchema.set("toObject", {
+    transform: (doc, ret) => {
+        delete ret.password;
+        return ret;
+    },
+});
+
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

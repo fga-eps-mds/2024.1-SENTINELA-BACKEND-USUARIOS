@@ -11,6 +11,7 @@ yarn-error.log
 
 # Arquivos de build
 /build
+/coverage
 
 # Arquivos de configuração de IDEs
 .idea
