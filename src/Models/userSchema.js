@@ -24,9 +24,8 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   status: {
-    type: String,
-    enum: ['Ativo', 'Inativo'],
-    default: 'Ativo'
+    type: Boolean,
+    default: true
   },
   createdAt: {
     type: Date,
