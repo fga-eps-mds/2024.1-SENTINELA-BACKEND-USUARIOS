@@ -37,39 +37,39 @@ jobs:
       - name: 🧪 Roda suíte de testes
         run: npm test
 
-  # sonarcloud:
-  #   name: sonarcloud
-  #   needs: [test]
-  #   runs-on: ubuntu-latest
-  #   continue-on-error: true
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 0
+  sonarcloud:
+    name: sonarcloud
+    needs: [test]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-  #     - name: 📬 Caching
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           ${{ github.workspace }}/node_modules
-  #           ${{ github.workspace }}/dist
-  #         key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-
+      - name: 📬 Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/node_modules
+            ${{ github.workspace }}/dist
+          key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
+          restore-keys: |
+            ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}-
 
-  #     - name: 🧰 Instala bibliotecas e dependências
-  #       run: npm i
+      - name: 🧰 Instala bibliotecas e dependências
+        run: npm i
 
-  #     # todo quando tiver eslint
-  #     # - name: 📜 Relatório do eslint
-  #     #   run: npx eslint -f json -o reports/eslint-report.json src || true
+      # todo quando tiver eslint
+      # - name: 📜 Relatório do eslint
+      #   run: npx eslint -f json -o reports/eslint-report.json src || true
 
-  #     - name: 🧪 Testes e cobertura
-  #       run: JEST_SONAR=jest-sonar CI=true npm test -- --coverage
+      - name: 🧪 Testes e cobertura
+        run: JEST_SONAR=jest-sonar CI=true npm test -- --coverage
 
-  #     - name: SonarCloud Scan
-  #       uses: SonarSource/sonarcloud-github-action@master
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
