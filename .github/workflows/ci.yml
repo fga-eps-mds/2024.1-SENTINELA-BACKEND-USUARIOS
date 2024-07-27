@@ -12,6 +12,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+      MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
+      MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      PORT: ${{ secrets.PORT }}
+      EMAIL: ${{ secrets.EMAIL }}
+      SECRET: ${{ secrets.SECRET }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -41,6 +49,14 @@ jobs:
     name: sonarcloud
     needs: [test]
     runs-on: ubuntu-latest
+    env:
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+      MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
+      MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      PORT: ${{ secrets.PORT }}
+      EMAIL: ${{ secrets.EMAIL }}
+      SECRET: ${{ secrets.SECRET }}
     continue-on-error: true
     steps:
       - name: Checkout code
