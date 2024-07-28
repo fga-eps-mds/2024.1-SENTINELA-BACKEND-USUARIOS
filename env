@@ -5,8 +5,7 @@
 
 NODE_ENV=development
 MONGO_URI=mongodb://root:password@userdb:27017/
-MONGO_INITDB_ROOT_USERNAME=root
-MONGO_INITDB_ROOT_PASSWORD=password
+OFFICIAL_MONGO_URI=???
 DB_HOST=userdb
 PORT=3001
 # host=
