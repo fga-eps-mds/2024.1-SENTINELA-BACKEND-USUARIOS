@@ -226,10 +226,10 @@ const membershipFormSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    situacaoAtual: {
-        type: String,
+    status: {
+        type: Boolean,
         required: true,
-        enum: ["Ativo", "Inativo"],
+        default: true,
     },
     religiao: {
         type: String,

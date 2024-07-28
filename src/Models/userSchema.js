@@ -108,10 +108,6 @@ const userSchema = new mongoose.Schema({
         required: true,
         enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
     },
-    situacaoAtual: {
-        type: String,
-        required: true,
-    },
     email: {
         type: String,
         required: true,

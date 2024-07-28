@@ -141,7 +141,6 @@ const initializeRoles = async () => {
                     escolaridade: "Ensino Superior",
                     religiao: "Nenhuma",
                     tipoSanguineo: "O+",
-                    situacaoAtual: "Ativo",
                     email: "admin@admin.com", // Make sure to hash the password before saving
                     celular: "1234567890",
                     telefone: "0987654321",

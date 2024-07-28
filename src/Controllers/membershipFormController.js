@@ -30,6 +30,12 @@ const createMembershipForm = async (req, res) => {
         }
 
         const membership = new MembershipForm(formData);
+
+        //Situação Atual = Status
+        if (formData.situacaoAtual == "Inativo") {
+            membership.status = false;
+        }
+
         await membership.save();
         console.log("Formulário de membro criado com sucesso:", membership);
         return res.status(201).send(membership);
