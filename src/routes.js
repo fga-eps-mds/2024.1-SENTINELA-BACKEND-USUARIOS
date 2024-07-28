@@ -3,7 +3,7 @@ const routes = express.Router();
 const UserController = require("./Controllers/userController");
 const RoleController = require("./Controllers/roleController");
 const { tokenValidation } = require("./Utils/token");
-const MembershipForm = require('./Controllers/membershipFormController');
+const MembershipForm = require("./Controllers/membershipFormController");
 
 // Private Routes
 // --user
@@ -29,9 +29,9 @@ routes.delete(
 );
 
 // --membership
-routes.post('/membership/create', MembershipForm.createMembershipForm);
-routes.get('/membership', MembershipForm.getMembershipForm);
-routes.delete('/membership/delete/:id', MembershipForm.deleteMembershipForm);
+routes.post("/membership/create", MembershipForm.createMembershipForm);
+routes.get("/membership", MembershipForm.getMembershipForm);
+routes.delete("/membership/delete/:id", MembershipForm.deleteMembershipForm);
 
 // --permissions
 routes.get("/users/:id/permission", UserController.hasPermission); // exemplo rota: ${baseURL}/users/1278hdfj1238j198189j/permission?moduleName=finance&action=read

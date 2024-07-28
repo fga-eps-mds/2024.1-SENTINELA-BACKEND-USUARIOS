@@ -1,25 +1,25 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const dependentSchema = new mongoose.Schema({
     nomeCompletoDependente: {
         type: String,
-        required: true
+        required: true,
     },
     dataNasc: {
         type: Date,
-        required: true
+        required: true,
     },
     parentesco: {
         type: String,
-        required: true
+        required: true,
     },
     cpfDependente: {
         type: String,
-        required: true
+        required: true,
     },
     celularDependente: {
         type: String,
-        required: true
+        required: true,
     },
 });
 
