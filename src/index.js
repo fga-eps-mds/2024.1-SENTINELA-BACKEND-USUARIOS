@@ -16,8 +16,6 @@ const corsOptions = {
 // Aplicar o middleware CORS antes das rotas
 app.use(cors(corsOptions));
 
-console.log(PORT);
-
 // Middleware para parsear JSON e dados URL-encoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -58,7 +56,7 @@ const startServer = async () => {
 };
 
 // Para desenvolvimento e execução normal
-if (NODE_ENV == "development") {
+if (NODE_ENV != "teste") {
     startServer();
 }
 
