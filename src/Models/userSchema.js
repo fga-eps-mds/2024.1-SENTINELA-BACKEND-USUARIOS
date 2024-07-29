@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Role",
+        required: true,
     },
     status: {
         type: Boolean,
