@@ -5,12 +5,14 @@
 npm-debug.log
 yarn-debug.log
 yarn-error.log
+package-lock.json
 
 # Arquivos de ambiente
 # .env
 
 # Arquivos de build
 /build
+/coverage
 
 # Arquivos de configuração de IDEs
 .idea

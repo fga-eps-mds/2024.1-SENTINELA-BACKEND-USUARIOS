@@ -1,4 +1,4 @@
-# Issue: closes: #
+# Issue: closes:
 
 ## descrição
 
@@ -6,7 +6,7 @@ Por favor, inclua um resumo das alterações e a motivação por trás delas.
 
 ## Tipo de alteração
 
-- [ ] Correção de bug (alteração não significativa para corrigir um problema)
+-   [ ] Correção de bug (alteração não significativa para corrigir um problema)
 
 ## Como isso foi testado?
 
@@ -14,5 +14,4 @@ Por favor, descreva os testes que você executou para verificar suas alteraçõe
 
 ## Checklist:
 
-- [ ] Meu código segue as diretrizes de estilo deste projeto
-
+-   [ ] Meu código segue as diretrizes de estilo deste projeto
