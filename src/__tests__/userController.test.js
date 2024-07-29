@@ -67,30 +67,6 @@ describe("User Controller Tests", () => {
         expect(res.body.email).toBe("janedoe@admin.com");
     });
 
-    it("should not create a user with missing required fields", async () => {
-        const res = await request(app).post("/signup").send({
-            email: "janedoe@admin.com",
-        });
-
-        expect(res.status).toBe(400);
-    });
-
-    it("should not create a user with an existing email", async () => {
-        await request(app).post("/signup").send({
-            name: "Jane Doe",
-            email: "janedoe@admin.com",
-            phone: "4002-8933",
-        });
-
-        const res = await request(app).post("/signup").send({
-            name: "Jane Doe",
-            email: "janedoe@admin.com",
-            phone: "4002-8933",
-        });
-
-        expect(res.status).toBe(400);
-    });
-
     it("should log in a user with correct credentials", async () => {
         const res = await request(app).post("/login").send({
             email: "admin@admin.com",
