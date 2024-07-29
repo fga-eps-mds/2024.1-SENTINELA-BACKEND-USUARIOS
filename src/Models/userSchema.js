@@ -8,7 +8,6 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        immutable: true,
         unique: true,
     },
     phone: {
@@ -25,6 +24,7 @@ const userSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         default: true,
+        require: true,
     },
     createdAt: {
         type: Date,

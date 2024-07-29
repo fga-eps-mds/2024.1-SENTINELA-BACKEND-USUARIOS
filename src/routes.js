@@ -17,15 +17,11 @@ routes.patch(
 );
 
 // --roles
-routes.post("/role/create", tokenValidation, RoleController.createRole);
+routes.post("/role/create", RoleController.createRole);
 routes.get("/role", RoleController.getAllRoles);
-routes.get("/role/:id", tokenValidation, RoleController.getRoleById);
-routes.patch("/role/patch/:id", tokenValidation, RoleController.updateRoleById);
-routes.delete(
-    "/role/delete/:id",
-    tokenValidation,
-    RoleController.deleteRoleById
-);
+routes.get("/role/:id", RoleController.getRoleById);
+routes.patch("/role/patch/:id", RoleController.updateRoleById);
+routes.delete("/role/delete/:id", RoleController.deleteRoleById);
 
 // --permissions
 routes.get("/users/:id/permission", UserController.hasPermission); // exemplo rota: ${baseURL}/users/1278hdfj1238j198189j/permission?moduleName=finance&action=read

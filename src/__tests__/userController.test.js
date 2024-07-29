@@ -10,15 +10,12 @@ const app = express();
 let mongoServer;
 
 const corsOptions = {
-    origin: ["http://localhost:5173/"],
+    origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
 };
 
-// Aplicar o middleware CORS antes das rotas
+// Aplicar o middleware antes das rotas
 app.use(cors(corsOptions));
-
-// Middleware para parsear JSON e dados URL-encoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -61,6 +58,7 @@ describe("User Controller Tests", () => {
             name: "Jane Doe",
             email: "janedoe@admin.com",
             phone: "4002-8933",
+            status: true,
         });
 
         expect(res.status).toBe(201);
@@ -78,8 +76,6 @@ describe("User Controller Tests", () => {
         expect(res.status).toBe(200);
         expect(res.body.user.email).toBe("admin@admin.com");
 
-        console.log("token: ", res.body.token);
-
         authToken = res.body.token;
         userId = res.body.user._id;
     });
@@ -92,6 +88,20 @@ describe("User Controller Tests", () => {
 
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty("error", "Email ou senha inválidos.");
+    });
+
+    it("should not allow access to protected routes without a token", async () => {
+        const res = await request(app).get("/users");
+
+        expect(res.status).toBe(401);
+    });
+
+    it("should not allow access to protected routes with an invalid token", async () => {
+        const res = await request(app)
+            .get("/users")
+            .set("Authorization", "Bearer invalidtoken");
+
+        expect(res.status).toBe(401);
     });
 
     it("should get all users", async () => {
@@ -124,10 +134,57 @@ describe("User Controller Tests", () => {
         const res = await request(app)
             .patch(`/users/patch/${userId}`)
             .set("Authorization", `Bearer ${authToken}`)
-            .send({ name: "Updated Name" });
+            .send({ updatedUser: { name: "Updated Name" } });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty("name", "Updated Name");
+    });
+
+    it("should return 500 for non-existent user when deleting", async () => {
+        const res = await request(app)
+            .delete(`/users/delete/invalidid`)
+            .set("Authorization", `Bearer ${authToken}`);
+
+        expect(res.status).toBe(500);
+    });
+
+    it("should recover password for existing user", async () => {
+        const res = await request(app)
+            .post("/users/recover-password")
+            .send({ email: "admin@admin.com" });
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("mensagem");
+    });
+
+    it("should not recover password for non-existent user", async () => {
+        const res = await request(app)
+            .post("/users/recover-password")
+            .send({ email: "nonexistent@admin.com" });
+
+        expect(res.status).toBe(404);
+        expect(res.body).toHaveProperty("mensagem", "Usuário não encontrado.");
+    });
+
+    it("should check permission for existing user", async () => {
+        const res = await request(app)
+            .get(`/users/${userId}/permission`)
+            .set("Authorization", `Bearer ${authToken}`)
+            .query({ moduleName: "users", action: "read" });
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("hasPermission");
+    });
+
+    it("should not check permission for non-existent user", async () => {
+        const fakeId = 1234;
+        const res = await request(app)
+            .get(`/users/${fakeId}/permission`)
+            .set("Authorization", `Bearer ${authToken}`)
+            .query({ moduleName: "module1", action: "read" });
+
+        expect(res.status).toBe(400 || 500);
+        expect(res.body).toHaveProperty("message");
     });
 
     it("should delete a user", async () => {
@@ -138,12 +195,93 @@ describe("User Controller Tests", () => {
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty("email", "admin@admin.com");
     });
+});
 
-    it("should return 500 for non-existent user when deleting", async () => {
+describe("Role Controller Tests", () => {
+    let authToken;
+    let roleId;
+
+    // Teste criar um role
+    it("should create a role", async () => {
         const res = await request(app)
-            .delete(`/users/delete/invalidid`)
+            .post("/role/create")
+            .set("Authorization", `Bearer ${authToken}`)
+            .send({
+                name: "Admin",
+                permissions: [
+                    {
+                        module: "module1",
+                        access: ["create", "read", "update", "delete"],
+                    },
+                ],
+            });
+
+        expect(res.status).toBe(201);
+        expect(res.body).toHaveProperty("name", "Admin");
+        roleId = res.body._id; // Guardar o ID do role criado
+    });
+
+    // Teste obter todos os roles
+    it("should get all roles", async () => {
+        await request(app)
+            .post("/role/create")
+            .set("Authorization", `Bearer ${authToken}`)
+            .send({
+                name: "Admin",
+                permissions: [
+                    {
+                        module: "module1",
+                        access: ["create", "read", "update", "delete"],
+                    },
+                ],
+            });
+
+        const res = await request(app)
+            .get("/role")
             .set("Authorization", `Bearer ${authToken}`);
 
-        expect(res.status).toBe(500);
+        expect(res.status).toBe(200);
+        expect(res.body).toBeInstanceOf(Array);
+        expect(res.body.length).toBeGreaterThan(0);
+    });
+
+    // Teste obter um role por ID
+    it("should get a role by ID", async () => {
+        const res = await request(app)
+            .get(`/role/${roleId}`)
+            .set("Authorization", `Bearer ${authToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("name", "Admin");
+    });
+
+    // Teste atualizar um role por ID
+    it("should update a role by ID", async () => {
+        const res = await request(app)
+            .patch(`/role/patch/${roleId}`)
+            .set("Authorization", `Bearer ${authToken}`)
+            .send({
+                name: "Updated Role",
+                permissions: [{ module: "module2", access: ["read"] }],
+            });
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("name", "Updated Role");
+    });
+
+    // Teste deletar um role por ID
+    it("should delete a role by ID", async () => {
+        const res = await request(app)
+            .delete(`/role/delete/${roleId}`)
+            .set("Authorization", `Bearer ${authToken}`);
+
+        expect(res.status).toBe(204);
+
+        // Verificar se o role foi realmente deletado
+        const checkRole = await request(app)
+            .get(`/role/${roleId}`)
+            .set("Authorization", `Bearer ${authToken}`);
+
+        expect(checkRole.status).toBe(404);
     });
 });
