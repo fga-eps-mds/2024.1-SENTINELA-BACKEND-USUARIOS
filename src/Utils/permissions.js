@@ -1,15 +1,16 @@
+const Role = require("../Models/roleSchema");
 const User = require("../Models/userSchema");
 
-async function hasPermission(userId, moduleName, action) {
-    const user = await User.findById(userId).populate("role");
+async function checkPermissions(userId, moduleName, action) {
+    const user = await User.findById(userId);
     if (!user || !user.role) {
         return false;
     }
 
-    const role = user.role;
+    const role = await Role.findById(user.role);
     const permission = role.permissions.find((p) => p.module === moduleName);
 
     return permission && permission.access.includes(action);
 }
 
-module.exports = { hasPermission };
+module.exports = { checkPermissions };
