@@ -124,7 +124,7 @@ describe("User Controller Tests", () => {
         const res = await request(app)
             .patch(`/users/patch/${userId}`)
             .set("Authorization", `Bearer ${authToken}`)
-            .send({ name: "Updated Name" });
+            .send({ updatedUser: { name: "Updated Name" } });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty("name", "Updated Name");

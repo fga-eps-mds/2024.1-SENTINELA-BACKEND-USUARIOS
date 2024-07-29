@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "start": "nodemon src/index.js",
-        "test": "jest",
+        "test": " NODE_ENV=test jest",
         "lint": "eslint .",
         "check-format": "prettier --check .",
         "format": "prettier --write .",

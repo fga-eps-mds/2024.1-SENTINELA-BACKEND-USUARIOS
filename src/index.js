@@ -22,6 +22,10 @@ const corsOptions = {
 // Aplicar o middleware CORS antes das rotas
 app.use(cors(corsOptions));
 
+// Middleware para parsear JSON e dados URL-encoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Rotas
 app.use("/", routes);
 

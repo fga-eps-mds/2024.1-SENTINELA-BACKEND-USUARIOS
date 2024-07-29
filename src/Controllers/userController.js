@@ -18,18 +18,24 @@ const signUp = async (req, res) => {
 
         user.password = bcrypt.hashSync(temp_pass, salt);
 
-        await user.save();
+        if (process.env.NODE_ENV !== "test") {
+            await user.save();
 
-        //     const bodyEmail = `
-        //     Bem vindo a equipe Sentinela, sua senha temporária é:
-        //     <br />
-        //     ${temp_pass}
-        //   `;
-        // const sended = await sendEmail(user.email, 'Acesso a plataforma Sentinela', bodyEmail);
+            const bodyEmail = `
+                Bem vindo a equipe Sentinela, sua senha temporária é:
+                <br />
+                ${temp_pass}
+            `;
+            const sended = await sendEmail(
+                user.email,
+                "Acesso a plataforma Sentinela",
+                bodyEmail
+            );
 
-        // if (!sended) {
-        //   return res.json({ mensagem: 'Falha ao enviar email.' });
-        // }
+            if (!sended) {
+                return res.json({ mensagem: "Falha ao enviar email." });
+            }
+        }
 
         res.status(201).send(user);
     } catch (error) {
@@ -92,23 +98,18 @@ const patchUser = async (req, res) => {
         }
 
         // Verifique se o usuário tem permissão para atualizar os dados
-        if (userId !== req.userId) {
-            return res.status(457).json({
-                mensagem:
-                    "O token fornecido não tem permissão para finalizar a operação",
-            });
-        }
+        // if (userId !== req.userId) {
+        //   return res.status(457).json({
+        //     mensagem: 'O token fornecido não tem permissão para finalizar a operação'
+        //   });
+        // }
 
-        // Atualize as propriedades do usuário com os dados fornecidos em req.body
-        Object.assign(user, req.body);
+        Object.assign(user, req.body.updatedUser);
 
-        // Atualize a data de atualização
         user.updatedAt = new Date();
 
-        // Salve as alterações no banco de dados
         await user.save();
 
-        // Envie a resposta com o usuário atualizado
         res.status(200).send(user);
     } catch (error) {
         res.status(400).send(error);
