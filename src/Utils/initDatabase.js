@@ -129,6 +129,7 @@ const initializeRoles = async () => {
                     name: "Admin",
                     email: "admin@admin.com",
                     phone: "1234567890",
+                    status: true,
                     password: hashedPassword,
                     role: adminRole._id,
                 });
