@@ -19,21 +19,23 @@ const signUp = async (req, res) => {
 
         user.password = bcrypt.hashSync(temp_pass, salt);
 
-        await user.save();
+        if (process.env.NODE_ENV !== "test") {
+            await user.save();
 
-        const bodyEmail = `
-            Bem vindo a equipe Sentinela, sua senha temporária é:
-            <br />
-            ${temp_pass}
-          `;
-        const sended = await sendEmail(
-            user.email,
-            "Acesso a plataforma Sentinela",
-            bodyEmail
-        );
+            const bodyEmail = `
+                Bem vindo a equipe Sentinela, sua senha temporária é:
+                <br />
+                ${temp_pass}
+            `;
+            const sended = await sendEmail(
+                user.email,
+                "Acesso a plataforma Sentinela",
+                bodyEmail
+            );
 
-        if (!sended) {
-            return res.json({ mensagem: "Falha ao enviar email." });
+            if (!sended) {
+                return res.json({ mensagem: "Falha ao enviar email." });
+            }
         }
 
         res.status(201).send(user);
