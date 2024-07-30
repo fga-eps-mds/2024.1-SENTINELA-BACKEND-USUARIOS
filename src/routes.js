@@ -18,15 +18,11 @@ routes.patch(
 );
 
 // --roles
-routes.post("/role/create", tokenValidation, RoleController.createRole);
+routes.post("/role/create", RoleController.createRole);
 routes.get("/role", RoleController.getAllRoles);
-routes.get("/role/:id", tokenValidation, RoleController.getRoleById);
-routes.patch("/role/patch/:id", tokenValidation, RoleController.updateRoleById);
-routes.delete(
-    "/role/delete/:id",
-    tokenValidation,
-    RoleController.deleteRoleById
-);
+routes.get("/role/:id", RoleController.getRoleById);
+routes.patch("/role/patch/:id", RoleController.updateRoleById);
+routes.delete("/role/delete/:id", RoleController.deleteRoleById);
 
 // --membership
 routes.post("/membership/create", MembershipForm.createMembershipForm);
