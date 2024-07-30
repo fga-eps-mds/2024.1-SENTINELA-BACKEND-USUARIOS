@@ -161,7 +161,7 @@ const initializeRoles = async () => {
 
             // Verifica se o usuário sindicalizado já existe
             const existingSindicalizado = await User.findOne({
-                email: "sindicalizado@domain.com", // Atualize conforme necessário
+                email: "ze@mail.com", 
             });
             if (!existingSindicalizado) {
                 const hashedPassword = await bcrypt.hash("senha", salt); // Altere a senha padrão conforme necessário
