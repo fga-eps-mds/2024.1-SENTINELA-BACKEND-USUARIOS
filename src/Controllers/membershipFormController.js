@@ -2,10 +2,7 @@ const MembershipForm = require("../Models/membershipFormSchema");
 
 const createMembershipForm = async (req, res) => {
     try {
-        console.log("Recebido body da requisição:", req.body);
-
         const formData = req.body.formData;
-
         const existingMembership = await MembershipForm.findOne({
             $or: [
                 { cpf: formData.cpf },
@@ -37,7 +34,6 @@ const createMembershipForm = async (req, res) => {
         }
 
         await membership.save();
-        console.log("Formulário de membro criado com sucesso:", membership);
         return res.status(201).send(membership);
     } catch (error) {
         console.error("Erro ao criar formulário de membro:", error);
