@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const { generateToken } = require("../Utils/token");
 const { sendEmail } = require("../Utils/email");
 const generator = require("generate-password");
+const { checkPermissions } = require("../Utils/permissions");
 
 const salt = bcrypt.genSaltSync();
 
@@ -18,18 +19,24 @@ const signUp = async (req, res) => {
 
         user.password = bcrypt.hashSync(temp_pass, salt);
 
-        await user.save();
+        if (process.env.NODE_ENV !== "test") {
+            await user.save();
 
-        //     const bodyEmail = `
-        //     Bem vindo a equipe Sentinela, sua senha temporária é:
-        //     <br />
-        //     ${temp_pass}
-        //   `;
-        // const sended = await sendEmail(user.email, 'Acesso a plataforma Sentinela', bodyEmail);
+            const bodyEmail = `
+                Bem vindo a equipe Sentinela, sua senha temporária é:
+                <br />
+                ${temp_pass}
+            `;
+            const sended = await sendEmail(
+                user.email,
+                "Acesso a plataforma Sentinela",
+                bodyEmail
+            );
 
-        // if (!sended) {
-        //   return res.json({ mensagem: 'Falha ao enviar email.' });
-        // }
+            if (!sended) {
+                return res.json({ mensagem: "Falha ao enviar email." });
+            }
+        }
 
         res.status(201).send(user);
     } catch (error) {
@@ -92,23 +99,18 @@ const patchUser = async (req, res) => {
         }
 
         // Verifique se o usuário tem permissão para atualizar os dados
-        if (userId !== req.userId) {
-            return res.status(457).json({
-                mensagem:
-                    "O token fornecido não tem permissão para finalizar a operação",
-            });
-        }
+        // if (userId !== req.userId) {
+        //   return res.status(457).json({
+        //     mensagem: 'O token fornecido não tem permissão para finalizar a operação'
+        //   });
+        // }
 
-        // Atualize as propriedades do usuário com os dados fornecidos em req.body
-        Object.assign(user, req.body);
+        Object.assign(user, req.body.updatedUser);
 
-        // Atualize a data de atualização
         user.updatedAt = new Date();
 
-        // Salve as alterações no banco de dados
         await user.save();
 
-        // Envie a resposta com o usuário atualizado
         res.status(200).send(user);
     } catch (error) {
         res.status(400).send(error);
@@ -179,7 +181,8 @@ const changePassword = async (req, res) => {
     const userId = req.params.id;
 
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(userId);
+
         if (!user) {
             return res.status(404).send();
         }
@@ -211,24 +214,23 @@ const changePassword = async (req, res) => {
 const hasPermission = async (req, res) => {
     const userId = req.params.id;
     const { moduleName, action } = req.query; // Parâmetros na URL
-
     try {
-        const user = await User.findById(userId).populate("role");
+        const user = await User.findById(userId);
         if (!user || !user.role) {
             return res.status(404).json({ message: "User or role not found" });
         }
 
-        const role = user.role;
-        const permission = role.permissions.find(
-            (p) => p.module === moduleName
-        );
+        const permission = await checkPermissions(userId, moduleName, action);
 
-        if (permission && permission.access.includes(action)) {
+        if (permission) {
             return res.status(200).json({ hasPermission: true });
         } else {
             return res.status(403).json({ hasPermission: false });
         }
     } catch (error) {
+        if (error.name === "CastError" && error.path === "_id") {
+            return res.status(400).json({ message: "Invalid user ID" });
+        }
         return res.status(500).json({ message: error.message });
     }
 };

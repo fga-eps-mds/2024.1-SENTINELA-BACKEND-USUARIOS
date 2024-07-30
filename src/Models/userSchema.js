@@ -8,7 +8,6 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        immutable: true,
         unique: true,
     },
     phone: {
@@ -17,14 +16,17 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
+        required: true,
     },
     role: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Role",
+        required: true,
     },
     status: {
         type: Boolean,
         default: true,
+        require: true,
     },
     createdAt: {
         type: Date,

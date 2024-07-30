@@ -12,7 +12,6 @@ const corsOptions = {
     origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 };
-
 // Aplicar o middleware CORS antes das rotas
 app.use(cors(corsOptions));
 
