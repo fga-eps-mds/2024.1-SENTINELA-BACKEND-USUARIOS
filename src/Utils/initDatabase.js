@@ -81,6 +81,16 @@ const initializeRoles = async () => {
                 },
             ],
         },
+        {
+            name: "sindicalizado",
+            permissions: [
+                {
+                    module: "benefits",
+                    access: ["read"],
+                },
+
+            ],
+        },
     ];
 
     try {
@@ -138,6 +148,38 @@ const initializeRoles = async () => {
                 console.log("Usuário administrador criado com sucesso.");
             } else {
                 console.log("Usuário administrador já existe.");
+            }
+
+            // Busca a role 'sindicalizado'
+            const sindicalizadoRole = await Role.findOne({ name: "sindicalizado" });
+            if (!sindicalizadoRole) {
+                console.error(
+                    'Role "sindicalizado" não encontrada. Crie a role antes de adicionar o usuário sindicalizado.'
+                );
+                return;
+            }
+
+            // Verifica se o usuário sindicalizado já existe
+            const existingSindicalizado = await User.findOne({
+                email: "sindicalizado@domain.com", // Atualize conforme necessário
+            });
+            if (!existingSindicalizado) {
+                const hashedPassword = await bcrypt.hash("senha", salt); // Altere a senha padrão conforme necessário
+
+                // Cria o usuário sindicalizado
+                const sindicalizadoUser = new User({
+                    name: "Ze",
+                    email: "ze@mail.com", 
+                    phone: "6199991010", 
+                    status: true,
+                    password: hashedPassword,
+                    role: sindicalizadoRole._id,
+                });
+
+                await sindicalizadoUser.save();
+                console.log("Usuário sindicalizado criado com sucesso.");
+            } else {
+                console.log("Usuário sindicalizado já existe.");
             }
         } else {
             console.error("Mongoose connection is not open");
