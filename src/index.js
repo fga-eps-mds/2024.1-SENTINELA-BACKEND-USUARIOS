@@ -6,14 +6,7 @@ const initializeRoles = require("./Utils/initDatabase");
 
 const app = express();
 
-const {
-    NODE_ENV,
-    MONGO_INITDB_ROOT_USERNAME,
-    MONGO_INITDB_ROOT_PASSWORD,
-    MONGO_URI,
-    DB_HOST,
-    PORT,
-} = process.env;
+const { NODE_ENV, OFFICIAL_MONGO_URI, MONGO_URI, PORT } = process.env;
 
 const corsOptions = {
     origin: "*",
@@ -38,7 +31,7 @@ let url;
 if (NODE_ENV === "development") {
     url = MONGO_URI;
 } else {
-    url = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${DB_HOST}/`;
+    url = OFFICIAL_MONGO_URI;
 }
 
 const startServer = async () => {
@@ -62,7 +55,7 @@ const startServer = async () => {
 };
 
 // Para desenvolvimento e execução normal
-if (NODE_ENV == "development") {
+if (NODE_ENV != "teste") {
     startServer();
 }
 
