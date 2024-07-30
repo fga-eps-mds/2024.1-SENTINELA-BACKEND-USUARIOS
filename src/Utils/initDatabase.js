@@ -88,7 +88,6 @@ const initializeRoles = async () => {
                     module: "benefits",
                     access: ["read"],
                 },
-
             ],
         },
     ];
@@ -151,7 +150,9 @@ const initializeRoles = async () => {
             }
 
             // Busca a role 'sindicalizado'
-            const sindicalizadoRole = await Role.findOne({ name: "sindicalizado" });
+            const sindicalizadoRole = await Role.findOne({
+                name: "sindicalizado",
+            });
             if (!sindicalizadoRole) {
                 console.error(
                     'Role "sindicalizado" não encontrada. Crie a role antes de adicionar o usuário sindicalizado.'
@@ -161,16 +162,15 @@ const initializeRoles = async () => {
 
             // Verifica se o usuário sindicalizado já existe
             const existingSindicalizado = await User.findOne({
-                email: "ze@mail.com", 
+                email: "ze@mail.com",
             });
             if (!existingSindicalizado) {
                 const hashedPassword = await bcrypt.hash("senha", salt); // Altere a senha padrão conforme necessário
 
-                // Cria o usuário sindicalizado
                 const sindicalizadoUser = new User({
                     name: "Ze",
-                    email: "ze@mail.com", 
-                    phone: "6199991010", 
+                    email: "ze@mail.com",
+                    phone: "6199991010",
                     status: true,
                     password: hashedPassword,
                     role: sindicalizadoRole._id,
