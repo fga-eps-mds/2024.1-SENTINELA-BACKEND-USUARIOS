@@ -34,6 +34,8 @@ routes.post("/users/recover-password", UserController.recoverPassword);
 routes.post("/membership/create", MembershipForm.createMembershipForm);
 routes.get("/membership", MembershipForm.getMembershipForm);
 routes.delete("/membership/delete/:id", MembershipForm.deleteMembershipForm);
+routes.get("/membership/request", MembershipForm.getOnlyNames);
+routes.patch("membership/updateStatus/id",MembershipForm.updateStatusMembership);
 
 // --permissions
 routes.get("/users/:id/permission", UserController.hasPermission); // exemplo rota: ${baseURL}/users/1278hdfj1238j198189j/permission?moduleName=finance&action=read

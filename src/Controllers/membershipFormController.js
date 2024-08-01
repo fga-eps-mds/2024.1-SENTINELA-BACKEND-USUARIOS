@@ -50,6 +50,16 @@ const getMembershipForm = async (req, res) => {
     }
 };
 
+const getOnlyNames = async (req, res) => {
+    try {
+        const membership = await MembershipForm.find({}).select("nomeCompleto -_id");
+        return res.status(200).send(membership);
+    } catch (error) {
+        return res.status(400).send({ error });
+    }
+}
+
+
 const deleteMembershipForm = async (req, res) => {
     try {
         const membership = await MembershipForm.findByIdAndDelete(
@@ -62,10 +72,27 @@ const deleteMembershipForm = async (req, res) => {
     } catch (error) {
         return res.status(400).send({ error });
     }
+    };
+
+
+const updateStatusMembership = async (req, res) => {
+    try {
+        const membership = await MembershipForm.findById(req.params.id);
+        if (!membership) {
+            return res.status(404).send({ error });
+        }
+        membership.status = !membership.status;
+        await membership.save();
+        return res.status(200).send(membership);
+    } catch (error) {
+        return res.status(400).send({ error });
+    }
 };
 
 module.exports = {
     createMembershipForm,
     getMembershipForm,
     deleteMembershipForm,
+    getOnlyNames,
+    updateStatusMembership,
 };
