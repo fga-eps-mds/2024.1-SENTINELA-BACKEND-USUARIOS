@@ -92,7 +92,9 @@ const updateStatusMembership = async (req, res) => {
 const deleAll = async (req, res) => {
     try {
         await MembershipForm.deleteMany({});
-        return res.status(200).send({ message: "All membership forms deleted" });
+        return res
+            .status(200)
+            .send({ message: "All membership forms deleted" });
     } catch (error) {
         return res.status(400).send({ error: error.message });
     }
