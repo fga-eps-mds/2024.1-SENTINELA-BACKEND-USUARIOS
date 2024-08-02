@@ -53,7 +53,7 @@ const getMembershipForm = async (req, res) => {
 const getOnlyNames = async (req, res) => {
     try {
         const membership = await MembershipForm.find({}).select(
-            "nomeCompleto -_id"
+            "nomeCompleto _id status"
         );
         return res.status(200).send(membership);
     } catch (error) {
@@ -85,7 +85,16 @@ const updateStatusMembership = async (req, res) => {
         await membership.save();
         return res.status(200).send(membership);
     } catch (error) {
-        return res.status(400).send({ error });
+        return res.status(400).send({ error: error.message });
+    }
+};
+
+const deleAll = async (req, res) => {
+    try {
+        await MembershipForm.deleteMany({});
+        return res.status(200).send({ message: "All membership forms deleted" });
+    } catch (error) {
+        return res.status(400).send({ error: error.message });
     }
 };
 
@@ -95,4 +104,5 @@ module.exports = {
     deleteMembershipForm,
     getOnlyNames,
     updateStatusMembership,
+    deleAll,
 };
