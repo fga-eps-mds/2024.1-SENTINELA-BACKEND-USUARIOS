@@ -1,57 +1,62 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const routes = require('./routes');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const routes = require("./routes");
+const initializeRoles = require("./Utils/initDatabase");
+
 const app = express();
 
-const {
-  NODE_ENV,
-  MONGO_INITDB_ROOT_USERNAME,
-  MONGO_INITDB_ROOT_PASSWORD,
-  MONGO_URI,
-  DB_HOST,
-  PORT
-} = process.env;
+const { NODE_ENV, OFFICIAL_MONGO_URI, MONGO_URI, PORT } = process.env;
 
-const corsOption = {
-  origin: ['http://localhost:5173'],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true
-}
+const corsOptions = {
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+};
+// Aplicar o middleware CORS antes das rotas
+app.use(cors(corsOptions));
 
-app.use(cors(corsOption));
+// Middleware para parsear JSON e dados URL-encoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Conect to MongoB
+// Rotas
+app.use("/", routes);
+
+// Endpoint para verificar se o servidor está pronto
+app.get("/", (req, res) => {
+    res.send("Hello, world!");
+});
+
 let url;
-if(NODE_ENV === "development") {
-  url = MONGO_URI;
+if (NODE_ENV === "development") {
+    url = MONGO_URI;
 } else {
-  url = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${DB_HOST}/`;
+    url = OFFICIAL_MONGO_URI;
 }
 
-mongoose.connect(url)
-  .then(() => {
-    console.log('Conectado ao MongoDB');
-  }).catch((err) => {
-    console.error('Erro ao conectar ao MongoDB', err);
-    process.exit(1);
-  });
+const startServer = async () => {
+    try {
+        // Conectar ao MongoDB
+        await mongoose.connect(url);
+        console.log("Connected to MongoDB");
 
-// Middleware para parsear JSON
-app.use(bodyParser.json());
+        // Inicializar roles
+        await initializeRoles();
 
-// Rotas import
-app.use(routes);
+        // Iniciar o servidor
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+            console.log("NODE_ENV:", NODE_ENV);
+        });
+    } catch (err) {
+        console.error("Error connecting to MongoDB or initializing roles", err);
+        process.exit(1);
+    }
+};
 
-// Route test
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
+// Para desenvolvimento e execução normal
+if (NODE_ENV != "teste") {
+    startServer();
+}
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-  console.log('NODE_ENV:', NODE_ENV);
-});
-
-module.exports = app;
+module.exports = { app, startServer };
