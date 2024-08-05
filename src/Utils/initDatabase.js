@@ -22,17 +22,17 @@ const initializeAdminUser = async () => {
           // role pode ser atribuída pelo frontend posteriormente
         });
 
-        await adminUser.save();
-        console.log('Usuário administrador criado com sucesso.');
-      } else {
-        console.log('Usuário administrador já existe.');
-      }
-    } else {
-      console.error('Mongoose connection is not open');
+                await adminUser.save();
+                console.log("Usuário administrador criado com sucesso.");
+            } else {
+                console.log("Usuário administrador já existe.");
+            }
+        } else {
+            console.error("Mongoose connection is not open");
+        }
+    } catch (err) {
+        console.error("Error initializing admin user:", err);
     }
-  } catch (err) {
-    console.error('Error initializing admin user:', err);
-  }
 };
 
 module.exports = initializeAdminUser;

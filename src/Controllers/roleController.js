@@ -1,4 +1,4 @@
-const Role = require('../Models/roleSchema');
+const Role = require("../Models/roleSchema");
 
 const createRole = async (req, res) => {
     try {
@@ -11,7 +11,6 @@ const createRole = async (req, res) => {
 };
 
 const getAllRoles = async (req, res) => {
-
     try {
         const roles = await Role.find();
         res.status(200).send(roles);
@@ -24,7 +23,7 @@ const getRoleById = async (req, res) => {
     try {
         const role = await Role.findById(req.params.id);
         if (!role) {
-            return res.status(404).json({ message: 'Role not found' });
+            return res.status(404).json({ message: "Role not found" });
         }
         res.status(200).json(role);
     } catch (error) {
@@ -34,9 +33,12 @@ const getRoleById = async (req, res) => {
 
 const updateRoleById = async (req, res) => {
     try {
-        const role = await Role.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const role = await Role.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+        });
         if (!role) {
-            return res.status(404).json({ message: 'Role not found' });
+            return res.status(404).json({ message: "Role not found" });
         }
         res.status(200).json(role);
     } catch (error) {
@@ -48,7 +50,7 @@ const deleteRoleById = async (req, res) => {
     try {
         const role = await Role.findByIdAndDelete(req.params.id);
         if (!role) {
-            return res.status(404).json({ message: 'Role not found' });
+            return res.status(404).json({ message: "Role not found" });
         }
         res.status(204).send();
     } catch (error) {
@@ -56,11 +58,10 @@ const deleteRoleById = async (req, res) => {
     }
 };
 
-
 module.exports = {
     createRole,
     getAllRoles,
     getRoleById,
     updateRoleById,
-    deleteRoleById
-}
+    deleteRoleById,
+};
