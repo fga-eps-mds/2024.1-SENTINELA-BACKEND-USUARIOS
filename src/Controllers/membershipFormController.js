@@ -2,7 +2,6 @@ const { sendEmail } = require("../Utils/email");
 
 const MembershipForm = require("../Models/membershipFormSchema");
 
-
 const createMembershipForm = async (req, res) => {
     try {
         const formData = req.body.formData;

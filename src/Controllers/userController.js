@@ -1,10 +1,14 @@
 const User = require("../Models/userSchema");
 
 const bcrypt = require("bcryptjs");
-const { generateToken } = require("../Utils/token");
+const {
+    generateToken,
+    generateRecoveryPasswordToken,
+} = require("../Utils/token");
 const { sendEmail } = require("../Utils/email");
 const generator = require("generate-password");
 const { checkPermissions } = require("../Utils/permissions");
+const Token = require("../Models/tokenSchema");
 
 const salt = bcrypt.genSaltSync();
 
@@ -130,9 +134,8 @@ const deleteUser = async (req, res) => {
 };
 
 const recoverPassword = async (req, res) => {
-    const { email } = req.body;
-
     try {
+        const { email } = req.body.data;
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -141,20 +144,28 @@ const recoverPassword = async (req, res) => {
                 .json({ mensagem: "Usuário não encontrado." });
         }
 
-        const temp_pass = generator.generate({
-            length: 6,
-            numbers: true,
-        });
+        // Gerar o token de recuperação de senha
+        const token = generateRecoveryPasswordToken(user._id);
 
-        user.password = bcrypt.hashSync(temp_pass, salt);
+        // Verificar se já existe um token para o email
+        await Token.findOneAndDelete({ email });
 
-        await user.save();
+        // Criar e salvar um novo token
+        const newToken = new Token({ token, email });
+        await newToken.save();
+
+        let url;
+        if (process.env.NODE_ENV === "deployment") {
+            url = `https://seu-dominio.com/recuperar-senha/${token}`;
+        } else {
+            url = `http://localhost:5173/trocar-senha/${token}`;
+        }
 
         const bodyEmail = `
-        Sua nova senha temporária é:
-        <br />
-        ${temp_pass}
-      `;
+            Acesse o link abaixo para trocar a senha: 
+            <br />
+            <a href="${url}">Link</a>
+        `;
         const sended = await sendEmail(
             user.email,
             "Redefinição de senha",
@@ -177,6 +188,30 @@ const recoverPassword = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
+    const { newPassword } = req.body;
+    const userId = req.params.id;
+
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).send({ message: "leopa" });
+        }
+
+        user.password = bcrypt.hashSync(newPassword, salt);
+        await user.save();
+
+        await Token.findOneAndDelete({ email: user.email });
+
+        return res.status(200).json({
+            mensagem: "senha alterada com sucesso.",
+        });
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+};
+
+const changePasswordInProfile = async (req, res) => {
     const { old_password, new_password } = req.body;
     const userId = req.params.id;
 
@@ -244,5 +279,6 @@ module.exports = {
     patchUser,
     recoverPassword,
     changePassword,
+    changePasswordInProfile,
     hasPermission,
 };

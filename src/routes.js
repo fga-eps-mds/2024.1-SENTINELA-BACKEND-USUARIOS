@@ -4,6 +4,7 @@ const UserController = require("./Controllers/userController");
 const RoleController = require("./Controllers/roleController");
 const { tokenValidation } = require("./Utils/token");
 const MembershipForm = require("./Controllers/membershipFormController");
+const TokenController = require("./Controllers/tokenController");
 
 //// Private Routes
 // --user
@@ -11,11 +12,6 @@ routes.get("/users", tokenValidation, UserController.getUsers);
 routes.get("/users/:id", tokenValidation, UserController.getUserById);
 routes.patch("/users/patch/:id", tokenValidation, UserController.patchUser);
 routes.delete("/users/delete/:id", tokenValidation, UserController.deleteUser);
-routes.patch(
-    "/users/change-password/:id",
-    tokenValidation,
-    UserController.changePassword
-);
 
 // --roles
 routes.post("/role/create", RoleController.createRole);
@@ -29,15 +25,19 @@ routes.delete("/role/delete/:id", RoleController.deleteRoleById);
 routes.post("/signup", UserController.signUp);
 routes.post("/login", UserController.login);
 routes.post("/users/recover-password", UserController.recoverPassword);
+routes.post("/verify-token", TokenController.getToken);
+routes.patch("/users/change-password/:id", UserController.changePassword);
 
 // --membership
 routes.post("/membership/create", MembershipForm.createMembershipForm);
 routes.get("/membership", MembershipForm.getMembershipForm);
 routes.delete("/membership/delete/:id", MembershipForm.deleteMembershipForm);
 routes.get("/membership/request", MembershipForm.getOnlyNames);
-routes.patch("/membership/updateStatus/:id",MembershipForm.updateStatusMembership);
+routes.patch(
+    "/membership/updateStatus/:id",
+    MembershipForm.updateStatusMembership
+);
 routes.delete("/membership/deleteAll", MembershipForm.deleAll);
-
 
 // --permissions
 routes.get("/users/:id/permission", UserController.hasPermission); // exemplo rota: ${baseURL}/users/1278hdfj1238j198189j/permission?moduleName=finance&action=read
