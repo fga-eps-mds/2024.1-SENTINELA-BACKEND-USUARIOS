@@ -29,7 +29,6 @@ const initializeRoles = async () => {
                 },
             ],
         },
-      
     ];
 
     try {
