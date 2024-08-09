@@ -1,8 +1,10 @@
 const { sendEmail } = require("../Utils/email");
 const User = require("../Models/userSchema");
-const generator = require("generate-password");
-const bcrypt = require("bcryptjs");
-const salt = bcrypt.genSaltSync();
+// const generator = require("generate-password");
+// const bcrypt = require("bcryptjs");
+const Token = require("../Models/tokenSchema");
+const { generateRecoveryPasswordToken } = require("../Utils/token");
+// const salt = bcrypt.genSaltSync();
 
 const createMembershipForm = async (req, res) => {
     try {
@@ -10,7 +12,7 @@ const createMembershipForm = async (req, res) => {
         const existingMembership = await User.findOne({
             $or: [
                 { cpf: formData.cpf },
-                { registration: formData.matricula },
+                { registration: formData.registration },
                 { email: formData.email },
                 { rg: formData.rg },
             ],
@@ -27,7 +29,7 @@ const createMembershipForm = async (req, res) => {
             if (existingMembership.rg === formData.rg)
                 errorMessage += "RG já cadastrado. ";
 
-            return res.status(777).json({ erro: errorMessage.trim() });
+            return res.status(400).json({ erro: errorMessage.trim() });
         }
 
         const membership = new User(formData);
@@ -36,13 +38,24 @@ const createMembershipForm = async (req, res) => {
         return res.status(201).send(membership);
     } catch (error) {
         console.error("Erro ao criar formulário de membro:", error);
-        return res.status(888).send({ error });
+        return res.status(500).send({ error });
     }
 };
 
 const getMembershipForm = async (req, res) => {
     try {
-        const membership = await User.find({ role: null });
+        const { status } = req.query;
+        const query = status ? { role: null, status: status } : { role: null };
+        const membership = await User.find(query);
+        return res.status(200).send(membership);
+    } catch (error) {
+        return res.status(400).send({ error });
+    }
+};
+
+const getMembershipById = async (req, res) => {
+    try {
+        const membership = await User.find(req.params.id);
         return res.status(200).send(membership);
     } catch (error) {
         return res.status(400).send({ error });
@@ -67,33 +80,23 @@ const updateStatusMembership = async (req, res) => {
         if (!membership) {
             return res.status(404).send({ error });
         }
-        membership.status = !membership.status;
-
-        const temp_pass = generator.generate({
-            length: 8,
-            numbers: true,
-        });
-
-        const user = new User({
-            _id: membership._id,
-            name: membership.name,
-            email: membership.email,
-            phone: membership.cellPhone,
-            password: temp_pass,
-            status: true,
-        });
-
-        user.password = bcrypt.hashSync(temp_pass, salt);
-
-        const filiedUser = await user.save();
-
-        console.log("filied: ", filiedUser);
-
-        if (!filiedUser) {
-            console.log("errei");
-        }
+        membership.status = true;
 
         await membership.save();
+
+        const token = generateRecoveryPasswordToken(membership._id);
+
+        await Token.findOneAndDelete({ email: membership.email });
+
+        const newToken = new Token({ token: token, email: membership.email });
+        await newToken.save();
+
+        let url;
+        if (process.env.NODE_ENV === "deployment") {
+            url = `https://seu-dominio.com/recuperar-senha/${token}`;
+        } else {
+            url = `http://localhost:5173/trocar-senha/${token}`;
+        }
 
         const bodyEmail = `Olá ${membership.name},
         <br /><br />
@@ -116,11 +119,9 @@ const updateStatusMembership = async (req, res) => {
             return res.status(500).send({ error: "Falha ao enviar email." });
         }
 
-        console.log("Email enviado com sucesso!");
-
         return res.status(200).send(membership);
     } catch (error) {
-        return res.status(400).send({ error: error.message });
+        return res.status(400).send({ error: error });
     }
 };
 
@@ -129,4 +130,5 @@ module.exports = {
     getMembershipForm,
     deleteMembershipForm,
     updateStatusMembership,
+    getMembershipById,
 };

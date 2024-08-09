@@ -21,14 +21,13 @@ routes.patch("/role/patch/:id", RoleController.updateRoleById);
 routes.delete("/role/delete/:id", RoleController.deleteRoleById);
 
 //// Public Routes (No token required)
-// --user
+// --user and memberShip
 routes.post("/signup", UserController.signUp);
 routes.post("/login", UserController.login);
 routes.post("/users/recover-password", UserController.recoverPassword);
 routes.post("/verify-token", TokenController.getToken);
 routes.patch("/users/change-password/:id", UserController.changePassword);
-
-// --membership
+//
 routes.post("/membership/create", MembershipForm.createMembershipForm);
 routes.get("/membership", MembershipForm.getMembershipForm);
 routes.delete("/membership/delete/:id", MembershipForm.deleteMembershipForm);
@@ -36,6 +35,7 @@ routes.patch(
     "/membership/updateStatus/:id",
     MembershipForm.updateStatusMembership
 );
+routes.get("/membership/:id", MembershipForm.getMembershipById);
 
 // --permissions
 routes.get("/users/:id/permission", UserController.hasPermission); // exemplo rota: ${baseURL}/users/1278hdfj1238j198189j/permission?moduleName=finance&action=read

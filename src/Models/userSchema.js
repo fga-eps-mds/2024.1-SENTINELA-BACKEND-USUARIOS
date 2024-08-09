@@ -143,12 +143,10 @@ const userSchema = new mongoose.Schema({
     },
     marialStatus: {
         type: String,
-
         enum: ["Solteiro", "Casado", "Separado", "Viúvo"],
     },
     education: {
         type: String,
-
         enum: [
             "Ensino Fundamental",
             "Ensino Médio",
