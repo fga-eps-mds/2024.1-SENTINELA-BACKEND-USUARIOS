@@ -23,9 +23,8 @@ const signUp = async (req, res) => {
 
         user.password = bcrypt.hashSync(temp_pass, salt);
 
+        await user.save();
         if (process.env.NODE_ENV !== "test") {
-            await user.save();
-
             const bodyEmail = `
                 Bem vindo a equipe Sentinela, sua senha temporária é:
                 <br />
@@ -73,7 +72,7 @@ const login = async (req, res) => {
 
 const getUsers = async (req, res) => {
     try {
-        const user = await User.find();
+        const user = await User.find().populate("role");
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
@@ -82,7 +81,7 @@ const getUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id).populate("role");
         if (!user) {
             return res.status(404).send();
         }
