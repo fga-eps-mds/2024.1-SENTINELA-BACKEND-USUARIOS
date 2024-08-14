@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    cellPhone: {
+        type: String,
+    },
     password: {
         type: String,
     },
@@ -30,7 +33,7 @@ const userSchema = new mongoose.Schema({
     },
     registration: {
         type: String,
-        unique: true,
+        sparse: true,
     },
     birthDate: {
         type: Date,
@@ -159,14 +162,14 @@ const userSchema = new mongoose.Schema({
     },
     rg: {
         type: Number,
-        unique: true,
+        sparse: true,
     },
     orgao: {
         type: String,
     },
     cpf: {
         type: String,
-        unique: true,
+        sparse: true,
     },
     hiringDate: {
         type: Date,

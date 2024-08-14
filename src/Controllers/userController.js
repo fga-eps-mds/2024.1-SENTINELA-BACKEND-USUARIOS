@@ -24,11 +24,35 @@ const signUp = async (req, res) => {
         user.password = bcrypt.hashSync(temp_pass, salt);
 
         await user.save();
+
+        const token = generateRecoveryPasswordToken(user._id);
+
+        await Token.findOneAndDelete({ email: user.email });
+
+        const newToken = new Token({ token: token, email: user.email });
+        await newToken.save();
+
+        let url;
+        if (process.env.NODE_ENV === "deployment") {
+            url = `https://seu-dominio.com/trocar-senha/${token}`;
+        } else {
+            url = `http://localhost:5173/trocar-senha/${token}`;
+        }
+
         if (process.env.NODE_ENV !== "test") {
-            const bodyEmail = `
-                Bem vindo a equipe Sentinela, sua senha temporária é:
-                <br />
-                ${temp_pass}
+            const bodyEmail = `Olá ${user.name},
+            <br /><br />
+            É um prazer tê-la conosco. O Sentinela oferece uma experiência única em gestão sindical, com suporte e atendimento personalizados.
+            <br />
+            sua senha temporária é:
+            <br />
+            ${temp_pass}
+            <br />
+            Para criar uma senha de acesso ao sistema clique: <a href="${url}">Link</a>
+            <br /><br />
+            Caso tenha dúvidas sobre o acesso à sua conta ou outras questões, entre em contato com nossa equipe de Suporte através do e-mail 
+            suporte@sentinela.sindpol.org.br ou pelo telefone (61) 3321-1949. Estamos disponíveis de segunda a sexta-feira
+            , das 8h às 12h e das 14h às 18h no horário de Brasília.
             `;
             const sended = await sendEmail(
                 user.email,
@@ -43,6 +67,7 @@ const signUp = async (req, res) => {
 
         res.status(201).send(user);
     } catch (error) {
+        console.log(error);
         res.status(400).send(error);
     }
 };
@@ -51,7 +76,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email: email });
+        const user = await User.findOne({ email: email, status: true });
 
         if (!user) {
             return res.status(400).send({ error: "Email ou senha inválidos." });
@@ -194,19 +219,22 @@ const changePassword = async (req, res) => {
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.status(404).send({ message: "leopa" });
+            return res.status(404).send({ message: "usuário não encontrado" });
         }
 
         user.password = bcrypt.hashSync(newPassword, salt);
-        await user.save();
 
+        await user.save();
         await Token.findOneAndDelete({ email: user.email });
 
         return res.status(200).json({
             mensagem: "senha alterada com sucesso.",
         });
     } catch (error) {
-        return res.status(500).send(error);
+        return res.status(500).send({
+            message: "Erro ao salvar o usuário",
+            error: error.message,
+        });
     }
 };
 

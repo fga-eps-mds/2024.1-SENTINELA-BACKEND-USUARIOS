@@ -34,6 +34,13 @@ const createMembershipForm = async (req, res) => {
 
         const membership = new User(formData);
 
+        const temp_pass = generator.generate({
+            length: 8,
+            numbers: true,
+        });
+
+        membership.password = bcrypt.hashSync(temp_pass, salt);
+
         await membership.save();
         return res.status(201).send(membership);
     } catch (error) {
