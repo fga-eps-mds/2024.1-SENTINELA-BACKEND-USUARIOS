@@ -1,10 +1,15 @@
 name: backend-usuarios-release
 
 on:
-    push:
-        branches: [main, devel]
-        tags:
-            - "v*"
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - main
+      - devel
+    types: [closed]
 
 jobs:
     generate-release:
