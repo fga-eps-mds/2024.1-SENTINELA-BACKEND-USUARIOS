@@ -1,10 +1,10 @@
 const { sendEmail } = require("../Utils/email");
 const User = require("../Models/userSchema");
-// const generator = require("generate-password");
-// const bcrypt = require("bcryptjs");
+const generator = require("generate-password");
+const bcrypt = require("bcryptjs");
 const Token = require("../Models/tokenSchema");
 const { generateRecoveryPasswordToken } = require("../Utils/token");
-// const salt = bcrypt.genSaltSync();
+const salt = bcrypt.genSaltSync();
 
 const createMembershipForm = async (req, res) => {
     try {
