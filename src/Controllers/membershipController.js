@@ -1,10 +1,10 @@
 const { sendEmail } = require("../Utils/email");
 const User = require("../Models/userSchema");
-// const generator = require("generate-password");
-// const bcrypt = require("bcryptjs");
+const generator = require("generate-password");
+const bcrypt = require("bcryptjs");
 const Token = require("../Models/tokenSchema");
 const { generateRecoveryPasswordToken } = require("../Utils/token");
-// const salt = bcrypt.genSaltSync();
+const salt = bcrypt.genSaltSync();
 
 const createMembershipForm = async (req, res) => {
     try {
@@ -61,10 +61,10 @@ const getMembershipForm = async (req, res) => {
 
 const getMembershipById = async (req, res) => {
     try {
-        const membership = await User.find(req.params.id);
+        const membership = await User.findById(req.params.id);
         return res.status(200).send(membership);
     } catch (error) {
-        return res.status(400).send({ error });
+        return res.status(404).send({ error });
     }
 };
 
@@ -98,7 +98,7 @@ const updateStatusMembership = async (req, res) => {
         await newToken.save();
 
         let url;
-        if (process.env.NODE_ENV === "deployment") {
+        if (process.env.NODE_ENV !== "deployment") {
             url = `https://seu-dominio.com/recuperar-senha/${token}`;
         } else {
             url = `http://localhost:5173/trocar-senha/${token}`;

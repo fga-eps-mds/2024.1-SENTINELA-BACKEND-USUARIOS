@@ -28,7 +28,7 @@ app.get("/", (req, res) => {
 });
 
 let url;
-if (NODE_ENV === "development") {
+if (NODE_ENV !== "deployment") {
     url = MONGO_URI;
 } else {
     url = OFFICIAL_MONGO_URI;
