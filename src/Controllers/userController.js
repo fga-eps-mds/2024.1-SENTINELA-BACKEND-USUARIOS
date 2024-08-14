@@ -1,10 +1,14 @@
 const User = require("../Models/userSchema");
 
 const bcrypt = require("bcryptjs");
-const { generateToken } = require("../Utils/token");
+const {
+    generateToken,
+    generateRecoveryPasswordToken,
+} = require("../Utils/token");
 const { sendEmail } = require("../Utils/email");
 const generator = require("generate-password");
 const { checkPermissions } = require("../Utils/permissions");
+const Token = require("../Models/tokenSchema");
 
 const salt = bcrypt.genSaltSync();
 
@@ -19,13 +23,36 @@ const signUp = async (req, res) => {
 
         user.password = bcrypt.hashSync(temp_pass, salt);
 
-        if (process.env.NODE_ENV !== "test") {
-            await user.save();
+        await user.save();
 
-            const bodyEmail = `
-                Bem vindo a equipe Sentinela, sua senha temporária é:
-                <br />
-                ${temp_pass}
+        const token = generateRecoveryPasswordToken(user._id);
+
+        await Token.findOneAndDelete({ email: user.email });
+
+        const newToken = new Token({ token: token, email: user.email });
+        await newToken.save();
+
+        let url;
+        if (process.env.NODE_ENV === "deployment") {
+            url = `https://seu-dominio.com/trocar-senha/${token}`;
+        } else {
+            url = `http://localhost:5173/trocar-senha/${token}`;
+        }
+
+        if (process.env.NODE_ENV !== "test") {
+            const bodyEmail = `Olá ${user.name},
+            <br /><br />
+            É um prazer tê-la conosco. O Sentinela oferece uma experiência única em gestão sindical, com suporte e atendimento personalizados.
+            <br />
+            sua senha temporária é:
+            <br />
+            ${temp_pass}
+            <br />
+            Para criar uma senha de acesso ao sistema clique: <a href="${url}">Link</a>
+            <br /><br />
+            Caso tenha dúvidas sobre o acesso à sua conta ou outras questões, entre em contato com nossa equipe de Suporte através do e-mail 
+            suporte@sentinela.sindpol.org.br ou pelo telefone (61) 3321-1949. Estamos disponíveis de segunda a sexta-feira
+            , das 8h às 12h e das 14h às 18h no horário de Brasília.
             `;
             const sended = await sendEmail(
                 user.email,
@@ -48,7 +75,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email: email });
+        const user = await User.findOne({ email: email, status: true });
 
         if (!user) {
             return res.status(400).send({ error: "Email ou senha inválidos." });
@@ -69,7 +96,7 @@ const login = async (req, res) => {
 
 const getUsers = async (req, res) => {
     try {
-        const user = await User.find();
+        const user = await User.find().populate("role");
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
@@ -78,7 +105,7 @@ const getUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id).populate("role");
         if (!user) {
             return res.status(404).send();
         }
@@ -130,31 +157,41 @@ const deleteUser = async (req, res) => {
 };
 
 const recoverPassword = async (req, res) => {
-    const { email } = req.body;
-
     try {
-        const user = await User.findOne({ email });
+        const { email } = req.body.data;
+        const user = await User.findOne({ email: email });
+
+        console.log(user);
 
         if (!user) {
+            console.log(email);
             return res
                 .status(404)
                 .json({ mensagem: "Usuário não encontrado." });
         }
 
-        const temp_pass = generator.generate({
-            length: 6,
-            numbers: true,
-        });
+        // Gerar o token de recuperação de senha
+        const token = generateRecoveryPasswordToken(user._id);
 
-        user.password = bcrypt.hashSync(temp_pass, salt);
+        // Verificar se já existe um token para o email
+        await Token.findOneAndDelete({ email });
 
-        await user.save();
+        // Criar e salvar um novo token
+        const newToken = new Token({ token, email });
+        await newToken.save();
+
+        let url;
+        if (process.env.NODE_ENV === "deployment") {
+            url = `https://seu-dominio.com/recuperar-senha/${token}`;
+        } else {
+            url = `http://localhost:5173/trocar-senha/${token}`;
+        }
 
         const bodyEmail = `
-        Sua nova senha temporária é:
-        <br />
-        ${temp_pass}
-      `;
+            Acesse o link abaixo para trocar a senha: 
+            <br />
+            <a href="${url}">Link</a>
+        `;
         const sended = await sendEmail(
             user.email,
             "Redefinição de senha",
@@ -168,15 +205,41 @@ const recoverPassword = async (req, res) => {
         return res.json({
             mensagem: "Email enviado com instruções para redefinir sua senha.",
         });
-    } catch (error) {
-        console.error("Erro ao solicitar redefinição de senha:", error);
+    } catch (err) {
         return res
             .status(500)
-            .json({ mensagem: "Erro interno ao processar solicitação." });
+            .json({ mensagem: "Erro interno ao processar solicitação.", err });
     }
 };
 
 const changePassword = async (req, res) => {
+    const { newPassword } = req.body;
+    const userId = req.params.id;
+
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).send({ message: "usuário não encontrado" });
+        }
+
+        user.password = bcrypt.hashSync(newPassword, salt);
+
+        await user.save();
+        await Token.findOneAndDelete({ email: user.email });
+
+        return res.status(200).json({
+            mensagem: "senha alterada com sucesso.",
+        });
+    } catch (error) {
+        return res.status(500).send({
+            message: "Erro ao salvar o usuário",
+            error: error.message,
+        });
+    }
+};
+
+const changePasswordInProfile = async (req, res) => {
     const { old_password, new_password } = req.body;
     const userId = req.params.id;
 
@@ -244,5 +307,6 @@ module.exports = {
     patchUser,
     recoverPassword,
     changePassword,
+    changePasswordInProfile,
     hasPermission,
 };
