@@ -159,9 +159,12 @@ const deleteUser = async (req, res) => {
 const recoverPassword = async (req, res) => {
     try {
         const { email } = req.body.data;
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email });
+
+        console.log(user);
 
         if (!user) {
+            console.log(email);
             return res
                 .status(404)
                 .json({ mensagem: "Usuário não encontrado." });
