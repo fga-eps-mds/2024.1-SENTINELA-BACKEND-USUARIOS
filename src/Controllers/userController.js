@@ -67,7 +67,6 @@ const signUp = async (req, res) => {
 
         res.status(201).send(user);
     } catch (error) {
-        console.log(error);
         res.status(400).send(error);
     }
 };
@@ -203,11 +202,10 @@ const recoverPassword = async (req, res) => {
         return res.json({
             mensagem: "Email enviado com instruções para redefinir sua senha.",
         });
-    } catch (error) {
-        console.error("Erro ao solicitar redefinição de senha:", error);
+    } catch (err) {
         return res
             .status(500)
-            .json({ mensagem: "Erro interno ao processar solicitação." });
+            .json({ mensagem: "Erro interno ao processar solicitação.", err });
     }
 };
 

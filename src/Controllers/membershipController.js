@@ -44,7 +44,6 @@ const createMembershipForm = async (req, res) => {
         await membership.save();
         return res.status(201).send(membership);
     } catch (error) {
-        console.error("Erro ao criar formulário de membro:", error);
         return res.status(500).send({ error });
     }
 };
