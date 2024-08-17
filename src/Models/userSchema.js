@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     },
     bloodType: {
         type: String,
-        enum: ["","A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+        enum: ["", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
     },
     registration: {
         type: String,
@@ -47,7 +47,8 @@ const userSchema = new mongoose.Schema({
     uf_naturalidade: {
         type: String,
 
-        enum: ["",
+        enum: [
+            "",
             "AC",
             "AL",
             "AP",
@@ -80,7 +81,8 @@ const userSchema = new mongoose.Schema({
     uf_orgao: {
         type: String,
 
-        enum: ["",
+        enum: [
+            "",
             "AC",
             "AL",
             "AP",
@@ -113,7 +115,8 @@ const userSchema = new mongoose.Schema({
     uf_address: {
         type: String,
 
-        enum: ["",
+        enum: [
+            "",
             "AC",
             "AL",
             "AP",
@@ -149,7 +152,8 @@ const userSchema = new mongoose.Schema({
     },
     education: {
         type: String,
-        enum: ["",
+        enum: [
+            "",
             "Ensino Fundamental",
             "Ensino Médio",
             "Ensino Técnico",
