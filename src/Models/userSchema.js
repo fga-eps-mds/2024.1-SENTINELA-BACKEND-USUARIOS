@@ -28,8 +28,7 @@ const userSchema = new mongoose.Schema({
     },
     bloodType: {
         type: String,
-
-        enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+        enum: ["", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
     },
     registration: {
         type: String,
@@ -40,7 +39,7 @@ const userSchema = new mongoose.Schema({
     },
     sex: {
         type: String,
-        enum: ["Masculino", "Feminino"],
+        enum: ["", "Masculino", "Feminino"],
     },
     naturalness: {
         type: String,
@@ -49,6 +48,7 @@ const userSchema = new mongoose.Schema({
         type: String,
 
         enum: [
+            "",
             "AC",
             "AL",
             "AP",
@@ -82,6 +82,7 @@ const userSchema = new mongoose.Schema({
         type: String,
 
         enum: [
+            "",
             "AC",
             "AL",
             "AP",
@@ -115,6 +116,7 @@ const userSchema = new mongoose.Schema({
         type: String,
 
         enum: [
+            "",
             "AC",
             "AL",
             "AP",
@@ -146,11 +148,12 @@ const userSchema = new mongoose.Schema({
     },
     marialStatus: {
         type: String,
-        enum: ["Solteiro", "Casado", "Separado", "Viúvo"],
+        enum: ["", "Solteiro", "Casado", "Separado", "Viúvo"],
     },
     education: {
         type: String,
         enum: [
+            "",
             "Ensino Fundamental",
             "Ensino Médio",
             "Ensino Técnico",
