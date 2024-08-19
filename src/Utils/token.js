@@ -8,12 +8,19 @@ const generateToken = (user_id) => {
     return token;
 };
 
+const generateRecoveryPasswordToken = (user_id) => {
+    const token = jwt.sign({ id: user_id }, SECRET, { expiresIn: "1d" }); // Token expira em 1 dia
+    return token;
+};
+
 const checkToken = (token) => {
     try {
         const decoded = jwt.verify(token, SECRET);
         return decoded.id;
     } catch {
-        return null; // Token inválido ou expirado
+        return res.status(401).json({
+            mensagem: "Token inválido ou expirado.",
+        });
     }
 };
 
@@ -38,4 +45,9 @@ const tokenValidation = (req, res, next) => {
     });
 };
 
-module.exports = { generateToken, checkToken, tokenValidation };
+module.exports = {
+    generateToken,
+    checkToken,
+    tokenValidation,
+    generateRecoveryPasswordToken,
+};

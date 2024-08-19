@@ -151,7 +151,7 @@ describe("User Controller Tests", () => {
     it("should recover password for existing user", async () => {
         const res = await request(app)
             .post("/users/recover-password")
-            .send({ email: "admin@admin.com" });
+            .send({ data: { email: "admin@admin.com" } });
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty("mensagem");
@@ -160,7 +160,7 @@ describe("User Controller Tests", () => {
     it("should not recover password for non-existent user", async () => {
         const res = await request(app)
             .post("/users/recover-password")
-            .send({ email: "nonexistent@admin.com" });
+            .send({ data: { email: "nonexistent@example.com" } });
 
         expect(res.status).toBe(404);
         expect(res.body).toHaveProperty("mensagem", "Usuário não encontrado.");
