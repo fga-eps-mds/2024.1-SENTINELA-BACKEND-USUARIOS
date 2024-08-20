@@ -5,9 +5,14 @@ const cors = require("cors");
 const routes = require("../routes");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const initializeRoles = require("../Utils/initDatabase");
+const { sendEmail } = require("../Utils/email");
 
 const app = express();
 let mongoServer;
+
+jest.mock("../Utils/email", () => ({
+    sendEmail: jest.fn(),
+}));
 
 const corsOptions = {
     origin: "*",
@@ -194,6 +199,21 @@ describe("User Controller Tests", () => {
 
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty("email", "admin@admin.com");
+    });
+
+    it("should not send an email if NODE_ENV is 'test'", async () => {
+        // Ensure NODE_ENV is set to 'test'
+        process.env.NODE_ENV = "test";
+
+        const res = await request(app).post("/signup").send({
+            name: "John Doe",
+            email: "johndoe@admin.com",
+            phone: "4002-8922",
+            status: true,
+        });
+
+        expect(res.status).toBe(201);
+        expect(sendEmail).not.toHaveBeenCalled();
     });
 });
 
