@@ -5,6 +5,7 @@ const RoleController = require("./Controllers/roleController");
 const { tokenValidation } = require("./Utils/token");
 const MembershipForm = require("./Controllers/membershipController");
 const TokenController = require("./Controllers/tokenController");
+const OrganController = require("./Controllers/organController");
 
 //// Private Routes
 // --user
@@ -19,6 +20,10 @@ routes.get("/role", RoleController.getAllRoles);
 routes.get("/role/:id", RoleController.getRoleById);
 routes.patch("/role/patch/:id", RoleController.updateRoleById);
 routes.delete("/role/delete/:id", RoleController.deleteRoleById);
+
+// --organ
+routes.post("/organ/create", OrganController.createOrgan);
+routes.get("/organ", OrganController.listOrgans);
 
 //// Public Routes (No token required)
 // --user and memberShip
