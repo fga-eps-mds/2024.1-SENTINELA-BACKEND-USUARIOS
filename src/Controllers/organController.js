@@ -1,4 +1,5 @@
 const Organ = require("../Models/organSchema");
+const mongoose = require("mongoose");
 
 const createOrgan = async (req, res) => {
     try {
@@ -20,7 +21,37 @@ const listOrgans = async (req, res) => {
     }
 };
 
+const updateOrgan = async (req, res) => {
+    try {
+        console.log(req.params);
+        const { id } = req.params;
+        console.log(id);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({ message: "ID inválido" });
+        }
+
+        // Log dos dados recebidos
+        console.log("Dados recebidos para atualização:", req.body);
+
+        // Atualizar apenas os campos fornecidos
+        const organ = await Organ.findByIdAndUpdate(id, req.body, {
+            new: true,
+            runValidators: true,
+        });
+        if (!organ) {
+            return res.status(404).send({ message: "Conta não encontrada" });
+        }
+
+        // Retornar o objeto atualizado
+        res.status(200).send(organ); // Corrigido para 'organ'
+    } catch (error) {
+        console.error("Erro ao atualizar conta bancária:", error.message);
+        res.status(500).send({ error: error.message });
+    }
+};
+
 module.exports = {
     createOrgan,
     listOrgans,
+    updateOrgan,
 };

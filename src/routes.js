@@ -23,7 +23,8 @@ routes.delete("/role/delete/:id", RoleController.deleteRoleById);
 
 // --organ
 routes.post("/organ/create", OrganController.createOrgan);
-routes.get("/organ", OrganController.listOrgans);
+routes.get("/organ/list", OrganController.listOrgans);
+routes.patch("/organ/update/:id", OrganController.updateOrgan);
 
 //// Public Routes (No token required)
 // --user and memberShip
