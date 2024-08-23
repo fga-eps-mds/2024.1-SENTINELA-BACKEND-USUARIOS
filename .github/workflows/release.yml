@@ -3,6 +3,8 @@ name: backend-usuarios-release
 on:
   push:
     branches: [main]
+    tags:
+      - "v*"
   pull_request:
     branches:
       - main
