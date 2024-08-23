@@ -50,8 +50,49 @@ const updateOrgan = async (req, res) => {
     }
 };
 
+const getOrganById = async (req, res) => {
+    try {
+        console.log(req.params.id);
+
+        // Buscar o documento pelo ID
+        const organ = await Organ.findById(req.params.id);
+
+        if (!organ) {
+            return res.status(404).send({ message: "Organ não encontrado" });
+        }
+
+        return res.status(200).send(organ);
+    } catch (error) {
+        console.error("Erro ao buscar Organ:", error.message);
+        return res.status(500).send({ error: error.message });
+    }
+};
+
+const deleteOrganById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({ message: "ID inválido" });
+        }
+
+        // Buscar e excluir o documento
+        const organ = await Organ.findByIdAndDelete(id);
+        if (!organ) {
+            return res.status(404).send({ message: "Organ não encontrado" });
+        }
+
+        // Retornar o documento excluído
+        res.status(200).send(organ);
+    } catch (error) {
+        console.error("Erro ao excluir Organ:", error.message);
+        res.status(500).send({ error: error.message });
+    }
+};
+
 module.exports = {
     createOrgan,
     listOrgans,
     updateOrgan,
+    getOrganById,
+    deleteOrganById,
 };

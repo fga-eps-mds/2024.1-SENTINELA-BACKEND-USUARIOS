@@ -25,6 +25,8 @@ routes.delete("/role/delete/:id", RoleController.deleteRoleById);
 routes.post("/organ/create", OrganController.createOrgan);
 routes.get("/organ/list", OrganController.listOrgans);
 routes.patch("/organ/update/:id", OrganController.updateOrgan);
+routes.get("/organ/get/:id", OrganController.getOrganById);
+routes.delete("/organ/delete/:id", OrganController.deleteOrganById);
 
 //// Public Routes (No token required)
 // --user and memberShip
