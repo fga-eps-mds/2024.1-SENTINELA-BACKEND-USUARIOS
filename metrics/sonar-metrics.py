@@ -48,7 +48,7 @@ def generate_metrics():
         underlined_repo_name = repository_name[:16] + \
             repository_name[16:].replace('-', "_")
 
-        filename = f"{prefix}-{underlined_repo_name}-{date_padrao_hilmer}-{branch}.json"
+        filename = f"{prefix}-{underlined_repo_name}-{date_padrao_hilmer}-{ref_name}.json"
         print(filename)
         with open(filename, "w") as file:
             json.dump(data, file)
