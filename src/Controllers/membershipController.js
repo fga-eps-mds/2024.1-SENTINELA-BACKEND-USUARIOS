@@ -1,15 +1,16 @@
 const { sendEmail } = require("../Utils/email");
-const User = require("../Models/userSchema");
+const Membership = require("../Models/membershipSchema");
 const generator = require("generate-password");
 const bcrypt = require("bcryptjs");
 const Token = require("../Models/tokenSchema");
 const { generateRecoveryPasswordToken } = require("../Utils/token");
 const salt = bcrypt.genSaltSync();
+const Role = require("../Models/roleSchema");
 
 const createMembershipForm = async (req, res) => {
     try {
         const formData = req.body.formData;
-        const existingMembership = await User.findOne({
+        const existingMembership = await Membership.findOne({
             $or: [
                 { cpf: formData.cpf },
                 { registration: formData.registration },
@@ -32,7 +33,17 @@ const createMembershipForm = async (req, res) => {
             return res.status(400).json({ erro: errorMessage.trim() });
         }
 
-        const membership = new User(formData);
+        const sindRole = await Role.findOne({ name: "sindicalizado" });
+        if (!sindRole) {
+            console.error(
+                'Role "sindicalizado" não encontrada. Crie a role antes de adicionar o usuário administrador.'
+            );
+            return;
+        }
+
+        formData.role = sindRole._id;
+
+        const membership = new Membership(formData);
 
         const temp_pass = generator.generate({
             length: 8,
@@ -49,10 +60,19 @@ const createMembershipForm = async (req, res) => {
 };
 
 const getMembershipForm = async (req, res) => {
+    const sindRole = await Role.findOne({ name: "sindicalizado" });
+    if (!sindRole) {
+        console.error(
+            'Role "sindicalizado" não encontrada. Crie a role antes de adicionar o usuário administrador.'
+        );
+        return;
+    }
     try {
         const { status } = req.query;
-        const query = status ? { role: null, status: status } : { role: null };
-        const membership = await User.find(query);
+        const query = status
+            ? { role: sindRole._id, status: status }
+            : { role: null };
+        const membership = await Membership.find(query);
         return res.status(200).send(membership);
     } catch (error) {
         return res.status(400).send({ error });
@@ -61,16 +81,16 @@ const getMembershipForm = async (req, res) => {
 
 const getMembershipById = async (req, res) => {
     try {
-        const membership = await User.find(req.params.id);
+        const membership = await Membership.findById(req.params.id);
         return res.status(200).send(membership);
     } catch (error) {
-        return res.status(400).send({ error });
+        return res.status(500).send({ error });
     }
 };
 
 const deleteMembershipForm = async (req, res) => {
     try {
-        const membership = await User.findByIdAndDelete(req.params.id);
+        const membership = await Membership.findByIdAndDelete(req.params.id);
         if (!membership) {
             return res.status(404).send({ error });
         }
@@ -82,7 +102,7 @@ const deleteMembershipForm = async (req, res) => {
 
 const updateStatusMembership = async (req, res) => {
     try {
-        const membership = await User.findById(req.params.id);
+        const membership = await Membership.findById(req.params.id);
         if (!membership) {
             return res.status(404).send({ error });
         }
@@ -131,10 +151,28 @@ const updateStatusMembership = async (req, res) => {
     }
 };
 
+const updateMembership = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const formData = req.body.formData;
+        const existingMembership = await Membership.findById(userId);
+
+        Object.assign(existingMembership, formData);
+
+        console.log(existingMembership);
+
+        await existingMembership.save();
+        return res.status(201).send(existingMembership);
+    } catch (error) {
+        return res.status(500).send({ error });
+    }
+};
+
 module.exports = {
     createMembershipForm,
     getMembershipForm,
     deleteMembershipForm,
     updateStatusMembership,
     getMembershipById,
+    updateMembership,
 };
