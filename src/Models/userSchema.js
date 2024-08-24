@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const dependentSchema = require("./dependentSchema");
 
 const userSchema = new mongoose.Schema({
     name: {
