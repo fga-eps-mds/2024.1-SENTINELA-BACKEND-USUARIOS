@@ -3,7 +3,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const routes = require("../routes"); // Ajuste o caminho conforme necessário
-const { MongoMemoryServer } = require("mongodb-memory-server");
 
 const app = express();
 let mongoServer;
@@ -92,7 +91,12 @@ describe("Organ Controller Tests", () => {
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty("orgao", "Orgao Test");
     });
+    it("should return 404 if the organ does not exist", async () => {
+        const invalidId = "12345";
+        const res = await request(app).get(`/organ/get/${invalidId}`);
 
+        expect(res.status).toBe(500);
+    });
     it("should update an organ by ID", async () => {
         const res = await request(app)
             .patch(`/organ/update/${organId}`)
@@ -127,5 +131,11 @@ describe("Organ Controller Tests", () => {
         const checkRes = await request(app).get(`/organ/delete/${organId}`);
 
         expect(checkRes.status).toBe(404);
+
+        //verifica se é um id válido
+        const invalidId = "12345";
+        const resInvalidId = await request(app).get(`/organ/get/${invalidId}`);
+
+        expect(resInvalidId.status).toBe(500);
     });
 });
