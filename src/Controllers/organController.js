@@ -4,11 +4,20 @@ const mongoose = require("mongoose");
 const createOrgan = async (req, res) => {
     try {
         const { orgao, lotacao } = req.body;
+
+        // Verifica se o órgão já existe
+        const existingOrgan = await Organ.findOne({ orgao });
+        if (existingOrgan) {
+            return res.status(409).send({ error: "Nome já cadastrado" });
+        }
+
         const organ = new Organ({ orgao, lotacao });
         await organ.save();
+
         return res.status(201).send(organ);
     } catch (error) {
-        return res.status(500).send({ error });
+        console.log(error);
+        return res.status(500).send({ error: "Erro interno do servidor" });
     }
 };
 
