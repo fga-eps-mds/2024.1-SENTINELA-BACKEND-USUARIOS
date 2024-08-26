@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const routes = require("../routes"); // Ajuste o caminho conforme necessário
+const { MongoMemoryServer } = require("mongodb-memory-server");
 
 const app = express();
 let mongoServer;
