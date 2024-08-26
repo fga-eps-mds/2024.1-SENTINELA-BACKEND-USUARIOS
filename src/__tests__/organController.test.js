@@ -121,6 +121,12 @@ describe("Organ Controller Tests", () => {
             ])
         );
     });
+    it("should return 400 if the organ does not exist", async () => {
+        const invalidId = "12345";
+        const res = await request(app).patch(`/organ/update/${invalidId}`);
+
+        expect(res.status).toBe(400);
+    });
 
     it("should delete an organ by ID", async () => {
         console.log(organId);
@@ -135,8 +141,10 @@ describe("Organ Controller Tests", () => {
 
         //verifica se é um id válido
         const invalidId = "12345";
-        const resInvalidId = await request(app).get(`/organ/get/${invalidId}`);
+        const resInvalidId = await request(app).delete(
+            `/organ/delete/${invalidId}`
+        );
 
-        expect(resInvalidId.status).toBe(500);
+        expect(resInvalidId.status).toBe(400);
     });
 });
