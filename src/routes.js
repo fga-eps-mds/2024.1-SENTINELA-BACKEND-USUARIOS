@@ -2,14 +2,22 @@ const express = require("express");
 const routes = express.Router();
 const UserController = require("./Controllers/userController");
 const RoleController = require("./Controllers/roleController");
+
 const { tokenValidation } = require("./Utils/token");
+const { checkPermissions } = require("./Utils/permissions");
+
 const MembershipForm = require("./Controllers/membershipController");
 const TokenController = require("./Controllers/tokenController");
 const OrganController = require("./Controllers/organController");
 
 //// Private Routes
 // --user
-routes.get("/users", tokenValidation, UserController.getUsers);
+routes.get(
+    "/users",
+    checkPermissions,
+    tokenValidation,
+    UserController.getUsers
+);
 routes.get("/users/:id", tokenValidation, UserController.getUserById);
 routes.patch("/users/patch/:id", tokenValidation, UserController.patchUser);
 routes.delete("/users/delete/:id", tokenValidation, UserController.deleteUser);

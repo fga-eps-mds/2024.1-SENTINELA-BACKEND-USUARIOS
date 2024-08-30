@@ -139,6 +139,27 @@ const initializeRoles = async () => {
             } else {
                 console.log("Usuário administrador já existe.");
             }
+
+            const ExistingSindicalizado = await User.findOne({
+                email: "user@user.com",
+            });
+            if (!ExistingSindicalizado) {
+                const hashedPassword = await bcrypt.hash("senha", salt); // Altere a senha padrão conforme necessário
+
+                // Cria o usuário administrador
+                const sindUser = new User({
+                    name: "User",
+                    email: "user@user.com",
+                    phone: "61981818181",
+                    status: true,
+                    password: hashedPassword,
+                });
+
+                await sindUser.save();
+                console.log("Usuário sindicalizado criado com sucesso.");
+            } else {
+                console.log("Usuário sindicalizado já existe.");
+            }
         } else {
             console.error("Mongoose connection is not open");
         }
