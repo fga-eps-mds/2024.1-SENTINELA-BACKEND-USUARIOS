@@ -76,7 +76,6 @@ const login = async (req, res) => {
 
     try {
         const user = await User.findOne({ email: email, status: true });
-        console.log(user);
         if (!user) {
             return res.status(400).send({ error: "Email ou senha inválidos." });
         } else if (!bcrypt.compareSync(password, user.password)) {

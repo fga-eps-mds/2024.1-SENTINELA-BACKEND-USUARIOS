@@ -159,8 +159,6 @@ const updateMembership = async (req, res) => {
 
         Object.assign(existingMembership, formData);
 
-        console.log(existingMembership);
-
         await existingMembership.save();
         return res.status(201).send(existingMembership);
     } catch (error) {
