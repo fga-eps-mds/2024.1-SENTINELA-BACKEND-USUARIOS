@@ -43,6 +43,7 @@ routes.patch(
     "/membership/updateStatus/:id",
     MembershipForm.updateStatusMembership
 );
+routes.patch("/membership/update/:id", MembershipForm.updateMembership);
 routes.get("/membership/:id", MembershipForm.getMembershipById);
 
 // --permissions

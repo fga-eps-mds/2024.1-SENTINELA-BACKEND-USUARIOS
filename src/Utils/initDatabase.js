@@ -30,53 +30,10 @@ const initializeRoles = async () => {
             ],
         },
         {
-            name: "diretoria",
+            name: "sindicalizado",
             permissions: [
                 {
-                    module: "finance",
-                    access: ["create", "read", "update", "delete"],
-                },
-                {
-                    module: "benefits",
-                    access: ["create", "read", "update", "delete"],
-                },
-                {
-                    module: "juridic",
-                    access: ["create", "read", "update", "delete"],
-                },
-            ],
-        },
-        {
-            name: "jurídico",
-            permissions: [
-                {
-                    module: "juridic",
-                    access: ["create", "read", "update", "delete"],
-                },
-            ],
-        },
-        {
-            name: "colaborador",
-            permissions: [
-                {
-                    module: "benefits",
-                    access: ["create", "read", "update", "delete"],
-                },
-                {
-                    module: "juridic",
-                    access: ["create", "read", "update", "delete"],
-                },
-            ],
-        },
-        {
-            name: "advogado",
-            permissions: [
-                {
-                    module: "benefits",
-                    access: ["create", "read", "update", "delete"],
-                },
-                {
-                    module: "juridic",
+                    module: "basic",
                     access: ["create", "read", "update", "delete"],
                 },
             ],
