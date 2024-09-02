@@ -75,19 +75,28 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email: email, status: true });
-        if (!user) {
-            return res.status(400).send({ error: "Email ou senha inválidos." });
-        } else if (!bcrypt.compareSync(password, user.password)) {
-            return res.status(400).send({ error: "Email ou senha inválidos." });
+        if (typeof email == "string") {
+            const user = await User.findOne({ email: email, status: true });
+
+            if (!user) {
+                return res
+                    .status(400)
+                    .send({ error: "Email ou senha inválidos." });
+            } else if (!bcrypt.compareSync(password, user.password)) {
+                return res
+                    .status(400)
+                    .send({ error: "Email ou senha inválidos." });
+            }
+
+            const token = generateToken(user._id);
+
+            return res.status(200).json({
+                token,
+                user,
+            });
+        } else {
+            return res.status(500).send({ error: "Tipo de dado incorreto" });
         }
-
-        const token = generateToken(user._id);
-
-        return res.status(200).json({
-            token,
-            user,
-        });
     } catch (error) {
         res.status(500).send(error);
     }
