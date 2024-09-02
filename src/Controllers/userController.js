@@ -179,7 +179,9 @@ const recoverPassword = async (req, res) => {
         const token = generateRecoveryPasswordToken(user._id);
 
         // Verificar se já existe um token para o email
-        await Token.findOneAndDelete({ email });
+        if (typeof email == "string") {
+            await Token.findOneAndDelete({ email });
+        }
 
         // Criar e salvar um novo token
         const newToken = new Token({ token, email });
