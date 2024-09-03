@@ -5,7 +5,6 @@ async function checkPermissions(req, res, next) {
     const userId = req.query?.userId;
     const moduleName = req.query?.moduleName;
     const action = req.query?.action;
-    console.log(userId, moduleName, action);
     try {
         const user = await User.findById(userId).populate("role");
         if (!user || !user.role) {

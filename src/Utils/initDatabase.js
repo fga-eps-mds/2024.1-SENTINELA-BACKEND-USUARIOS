@@ -81,6 +81,27 @@ const initializeRoles = async () => {
                 },
             ],
         },
+        {
+            name: "Usuário",
+            permissions: [
+                {
+                    module: "benefits",
+                    access: ["read"],
+                },
+                {
+                    module: "finance",
+                    access: ["read"],
+                },
+                {
+                    module: "users",
+                    access: ["read"],
+                },
+                {
+                    module: "juridic",
+                    access: ["read"],
+                },
+            ],
+        },
     ];
 
     try {
@@ -113,6 +134,13 @@ const initializeRoles = async () => {
             if (!adminRole) {
                 console.error(
                     'Role "administrador" não encontrada. Crie a role antes de adicionar o usuário administrador.'
+                );
+                return;
+            }
+            const userRole = await Role.findOne({ name: "Usuário" });
+            if (!userRole) {
+                console.error(
+                    'Role "Usuário" nao encontrada. Crie a role antes de acidionar o usuário'
                 );
                 return;
             }
@@ -153,6 +181,7 @@ const initializeRoles = async () => {
                     phone: "61981818181",
                     status: true,
                     password: hashedPassword,
+                    role: userRole,
                 });
 
                 await sindUser.save();
