@@ -30,74 +30,10 @@ const initializeRoles = async () => {
             ],
         },
         {
-            name: "diretoria",
-            permissions: [
-                {
-                    module: "finance",
-                    access: ["create", "read", "update", "delete"],
-                },
-                {
-                    module: "benefits",
-                    access: ["create", "read", "update", "delete"],
-                },
-                {
-                    module: "juridic",
-                    access: ["create", "read", "update", "delete"],
-                },
-            ],
-        },
-        {
-            name: "jurídico",
-            permissions: [
-                {
-                    module: "juridic",
-                    access: ["create", "read", "update", "delete"],
-                },
-            ],
-        },
-        {
-            name: "colaborador",
-            permissions: [
-                {
-                    module: "benefits",
-                    access: ["create", "read", "update", "delete"],
-                },
-                {
-                    module: "juridic",
-                    access: ["create", "read", "update", "delete"],
-                },
-            ],
-        },
-        {
-            name: "advogado",
-            permissions: [
-                {
-                    module: "benefits",
-                    access: ["create", "read", "update", "delete"],
-                },
-                {
-                    module: "juridic",
-                    access: ["create", "read", "update", "delete"],
-                },
-            ],
-        },
-        {
             name: "Usuário",
             permissions: [
                 {
-                    module: "benefits",
-                    access: ["read"],
-                },
-                {
-                    module: "finance",
-                    access: ["read"],
-                },
-                {
                     module: "users",
-                    access: ["read"],
-                },
-                {
-                    module: "juridic",
                     access: ["read"],
                 },
             ],
@@ -174,7 +110,6 @@ const initializeRoles = async () => {
             if (!ExistingSindicalizado) {
                 const hashedPassword = await bcrypt.hash("senha", salt); // Altere a senha padrão conforme necessário
 
-                // Cria o usuário administrador
                 const sindUser = new User({
                     name: "User",
                     email: "user@user.com",
