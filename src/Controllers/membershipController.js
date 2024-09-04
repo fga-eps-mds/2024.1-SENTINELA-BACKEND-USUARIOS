@@ -91,8 +91,13 @@ const updateStatusMembership = async (req, res) => {
         await membership.save();
 
         const token = generateRecoveryPasswordToken(membership._id);
+        const defaultRole = await Role.findOne({ name: "Usuário" });
 
         await Token.findOneAndDelete({ email: membership.email });
+
+        if (!membership.role && defaultRole) {
+            membership.role = defaultRole._id;
+        }
 
         const newToken = new Token({ token: token, email: membership.email });
         await newToken.save();

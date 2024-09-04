@@ -30,17 +30,23 @@ const roleSchema = new mongoose.Schema({
 roleSchema.post("findOneAndDelete", async function (doc) {
     if (doc) {
         try {
-
             const defaultRole = await Role.findOne({ name: "Usuário" });
 
             if (defaultRole) {
-
-                await User.updateMany({ role: doc._id }, { role: defaultRole._id });
+                await User.updateMany(
+                    { role: doc._id },
+                    { role: defaultRole._id }
+                );
             } else {
-                console.error("Role padrão não encontrada. Nenhuma atualização foi feita nos usuários.");
+                console.error(
+                    "Role padrão não encontrada. Nenhuma atualização foi feita nos usuários."
+                );
             }
         } catch (error) {
-            console.error("Erro ao atualizar usuários para a role padrão:", error);
+            console.error(
+                "Erro ao atualizar usuários para a role padrão:",
+                error
+            );
         }
     }
 });

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const dependentSchema = require("./dependentSchema");
-const Role = require("./roleSchema");
+//const Role = require("./roleSchema");
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -246,23 +246,20 @@ userSchema.set("toObject", {
     },
 });
 
+// userSchema.pre("save", async function (next) {
+//     if (!this.role) {
+//         try {
 
-
-userSchema.pre("save", async function (next) {
-    if (!this.role) {
-        try {
-
-            const defaultRole = await Role.findOne({ name: "Usuário" });
-            if (defaultRole) {
-                this.role = defaultRole._id;
-            }
-        } catch (error) {
-            return next(error);
-        }
-    }
-    next();
-});
-
+//             const defaultRole = await Role.findOne({ name: "Usuário" });
+//             if (defaultRole) {
+//                 this.role = defaultRole._id;
+//             }
+//         } catch (error) {
+//             return next(error);
+//         }
+//     }
+//     next();
+// });
 
 const User = mongoose.model("User", userSchema);
 
