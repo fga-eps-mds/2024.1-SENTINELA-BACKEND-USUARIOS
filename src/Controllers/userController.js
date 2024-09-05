@@ -76,7 +76,6 @@ const login = async (req, res) => {
 
     try {
         const user = await User.findOne({ email: email, status: true });
-
         if (!user) {
             return res.status(400).send({ error: "Email ou senha inválidos." });
         } else if (!bcrypt.compareSync(password, user.password)) {
@@ -161,10 +160,7 @@ const recoverPassword = async (req, res) => {
         const { email } = req.body.data;
         const user = await User.findOne({ email: email });
 
-        console.log(user);
-
         if (!user) {
-            console.log(email);
             return res
                 .status(404)
                 .json({ mensagem: "Usuário não encontrado." });
