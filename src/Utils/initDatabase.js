@@ -28,6 +28,7 @@ const initializeRoles = async () => {
                     access: ["create", "read", "update", "delete"],
                 },
             ],
+            isProtected: true,
         },
         {
             name: "sindicalizado",
@@ -37,6 +38,7 @@ const initializeRoles = async () => {
                     access: ["create", "read", "update", "delete"],
                 },
             ],
+            isProtected: true,
         },
         {
             name: "Usuário",
@@ -46,6 +48,7 @@ const initializeRoles = async () => {
                     access: ["read"],
                 },
             ],
+            isProtected: true,
         },
     ];
 

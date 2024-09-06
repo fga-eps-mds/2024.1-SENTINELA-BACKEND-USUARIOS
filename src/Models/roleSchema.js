@@ -9,23 +9,17 @@ const roleSchema = new mongoose.Schema({
     },
     permissions: [
         {
-            module: { type: String, required: true },
-            access: {
-                type: [String],
-                required: true,
-                enum: ["create", "read", "update", "delete"],
-            },
+            module: String,
+            access: [String],
         },
     ],
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
+    isProtected: {
+        type: Boolean,
+        default: false,
     },
 });
+
+module.exports = mongoose.model("Role", roleSchema);
 
 roleSchema.post("findOneAndDelete", async function (doc) {
     if (doc) {
