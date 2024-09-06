@@ -66,6 +66,27 @@ describe("RoleController Test Suite", () => {
             expect(response.status).toBe(201);
             expect(response.body).toHaveProperty("_id");
         });
+
+        it("should not create a new role with no name", async () => {
+            const newRole = {
+                permissions: [
+                    {
+                        module: "finance",
+                        access: ["create"],
+                    },
+                    {
+                        module: "benefits",
+                        access: ["create"],
+                    },
+                    {
+                        module: "users",
+                        access: ["create"],
+                    },
+                ],
+            };
+            const response = await createRole(newRole);
+            expect(response.status).toBe(400);
+        });
     });
 
     describe("GET /role", () => {
@@ -91,6 +112,14 @@ describe("RoleController Test Suite", () => {
             expect(getResponse.status).toBe(200);
             expect(getResponse.body).toHaveProperty("_id", roleId);
         });
+
+        it("should not retrieve a specific role with invalid ID", async () => {
+            //Try access with invalid ID
+            const roleId = "A1";
+            const getResponse = await request(app).get(`/role/${roleId}`);
+
+            expect(getResponse.status).toBe(500);
+        });
     });
 
     describe("PATCH /role/patch/:id", () => {
@@ -113,6 +142,19 @@ describe("RoleController Test Suite", () => {
             expect(response.body).toHaveProperty("_id", roleId);
             expect(response.body.name).toBe("Perfil Updated");
         });
+
+        it("should not update the role data with invalid ID", async () => {
+            const roleId = "A1";
+            const updatedData = {
+                name: "Perfil Updated",
+            };
+
+            const response = await request(app)
+                .patch(`/role/patch/${roleId}`)
+                .send(updatedData);
+
+            expect(response.status).toBe(400);
+        });
     });
 
     describe("DELETE /role/:id", () => {
@@ -126,6 +168,15 @@ describe("RoleController Test Suite", () => {
                 `/role/delete/${roleId}`
             );
             expect(deleteResponse.status).toBe(204);
+        });
+
+        it("should not delete a specific role with invalid ID", async () => {
+            const roleId = "A1";
+
+            const deleteResponse = await request(app).delete(
+                `/role/delete/${roleId}`
+            );
+            expect(deleteResponse.status).toBe(500);
         });
     });
 });
