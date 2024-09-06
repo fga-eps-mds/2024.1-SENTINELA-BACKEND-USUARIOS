@@ -124,6 +124,14 @@ describe("MembershipController Test Suite", () => {
             expect(getResponse.status).toBe(200);
             expect(getResponse.body).toHaveProperty("_id", membershipId);
         });
+        it("should not retrieve a specific membership with invalid ID", async () => {
+            const membershipId = "A1";
+            const getResponse = await request(app).get(
+                `/membership/${membershipId}`
+            );
+
+            expect(getResponse.status).toBe(500);
+        });
     });
 
     describe("PATCH /membership/status/:id", () => {
@@ -150,7 +158,7 @@ describe("MembershipController Test Suite", () => {
         });
 
         it("should return 404 if membership is not found", async () => {
-            const invalidId = "60d5f3f3f3f3f3f3f3f3f3f"; // Example of an invalid ID
+            const invalidId = "A1"; // Example of an invalid ID
             const response = await request(app).patch(
                 `/membership/status/${invalidId}`
             );
@@ -196,6 +204,14 @@ describe("MembershipController Test Suite", () => {
             );
             expect(deleteResponse.status).toBe(200);
             expect(deleteResponse.body).toHaveProperty("_id", membershipId);
+        });
+        it("should not delete a specific membership if ID not found", async () => {
+            const membershipId = "A1";
+
+            const deleteResponse = await request(app).delete(
+                `/membership/delete/${membershipId}`
+            );
+            expect(deleteResponse.status).toBe(400);
         });
     });
 });
