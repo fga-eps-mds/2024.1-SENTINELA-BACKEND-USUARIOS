@@ -6,9 +6,14 @@ const createOrgan = async (req, res) => {
         const { orgao, lotacao } = req.body;
 
         // Verifica se o órgão já existe
-        const existingOrgan = await Organ.findOne({ orgao });
-        if (existingOrgan) {
-            return res.status(409).send({ error: "Nome já cadastrado" });
+        if (typeof orgao == "string") {
+            const existingOrgan = await Organ.findOne({ orgao });
+
+            if (existingOrgan) {
+                return res.status(409).send({ error: "Nome já cadastrado" });
+            }
+        } else {
+            return res.status(500).send({ error: "Tipo de dado incorreto" });
         }
 
         const organ = new Organ({ orgao, lotacao });
