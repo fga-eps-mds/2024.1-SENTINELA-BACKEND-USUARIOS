@@ -108,6 +108,7 @@ const initializeRoles = async () => {
                     status: true,
                     password: hashedPassword,
                     role: adminRole._id,
+                    isProtected: true,
                 });
 
                 await adminUser.save();
@@ -130,6 +131,7 @@ const initializeRoles = async () => {
                     status: true,
                     password: hashedPassword,
                     role: userRole,
+                    isProtected: true,
                 });
 
                 await sindUser.save();

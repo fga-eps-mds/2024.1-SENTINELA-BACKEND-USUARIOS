@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    isProtected: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 userSchema.set("toJSON", {

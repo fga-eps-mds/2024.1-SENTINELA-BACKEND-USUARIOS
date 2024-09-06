@@ -145,13 +145,25 @@ const patchUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id);
+        // Encontre o usuário pelo ID
+        const user = await User.findById(req.params.id).populate("role");
+
         if (!user) {
-            return res.status(404).send();
+            return res.status(404).json({ message: "User not found" });
         }
-        res.status(200).send(user);
+
+        // Verifique se a role do usuário é protegida
+        if (user.role && user.role.isProtected) {
+            return res
+                .status(403)
+                .json({ message: "Cannot delete user with protected role" });
+        }
+
+        // Se a role não for protegida, realize a exclusão do usuário
+        await User.findByIdAndDelete(req.params.id);
+        res.status(200).json(user);
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).json({ message: error.message });
     }
 };
 
