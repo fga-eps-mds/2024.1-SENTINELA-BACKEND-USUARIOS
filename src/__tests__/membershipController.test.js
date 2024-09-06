@@ -5,6 +5,7 @@ const cors = require("cors");
 const routes = require("../routes");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const initializeRoles = require("../Utils/initDatabase");
+const emailModule = require("../Utils/email");
 
 const app = express();
 let mongoServer;
@@ -17,6 +18,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/", routes);
+
+// Mocking email function
+jest.mock("../Utils/email", () => ({
+    sendEmail: jest.fn().mockResolvedValue(true),
+}));
 
 const generateMembershipData = (suffix) => ({
     formData: {
@@ -32,7 +38,8 @@ const generateMembershipData = (suffix) => ({
         uf_naturalidade: "GO",
         uf_orgao: "ES",
         uf_address: "GO",
-        marialStatus: "Solteiro",
+        maritalStatus: "Solteiro",
+        status: false,
         education: "Ensino Médio",
         rg: 1234567 + Number(suffix),
         orgao: "Orgao Exp",
@@ -67,6 +74,7 @@ describe("MembershipController Test Suite", () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
+
         await initializeRoles();
     });
 
@@ -115,6 +123,64 @@ describe("MembershipController Test Suite", () => {
 
             expect(getResponse.status).toBe(200);
             expect(getResponse.body).toHaveProperty("_id", membershipId);
+        });
+    });
+
+    describe("PATCH /membership/status/:id", () => {
+        it("should update membership status and send a recovery email", async () => {
+            const membershipData = generateMembershipData("005");
+            const postResponse = await createMembership(membershipData);
+            expect(postResponse.status).toBe(201);
+
+            const membershipId = postResponse.body._id;
+            const response = await request(app).patch(
+                `/membership/updateStatus/${membershipId}`
+            );
+
+            expect(response.status).toBe(200);
+            expect(response.body).toHaveProperty("_id", membershipId);
+            expect(response.body.status).toBe(true);
+
+            // Verify that sendEmail was called with the expected arguments
+            expect(emailModule.sendEmail).toHaveBeenCalledWith(
+                membershipData.formData.email,
+                "Solicitação de Membro",
+                expect.any(String) // Assuming the email body is a string
+            );
+        });
+
+        it("should return 404 if membership is not found", async () => {
+            const invalidId = "60d5f3f3f3f3f3f3f3f3f3f"; // Example of an invalid ID
+            const response = await request(app).patch(
+                `/membership/status/${invalidId}`
+            );
+
+            expect(response.status).toBe(404);
+        });
+    });
+
+    describe("PATCH /membership/update/:id", () => {
+        it("should update the membership data", async () => {
+            const membershipData = generateMembershipData("007");
+            const postResponse = await createMembership(membershipData);
+            expect(postResponse.status).toBe(201);
+
+            const membershipId = postResponse.body._id;
+            const updatedData = {
+                formData: {
+                    name: "UpdatedName",
+                    email: "updatedemail@test.com",
+                },
+            };
+
+            const response = await request(app)
+                .patch(`/membership/update/${membershipId}`)
+                .send(updatedData);
+
+            expect(response.status).toBe(201);
+            expect(response.body).toHaveProperty("_id", membershipId);
+            expect(response.body.name).toBe("UpdatedName");
+            expect(response.body.email).toBe("updatedemail@test.com");
         });
     });
 
