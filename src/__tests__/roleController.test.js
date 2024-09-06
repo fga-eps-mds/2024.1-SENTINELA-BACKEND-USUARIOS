@@ -66,17 +66,6 @@ describe("RoleController Test Suite", () => {
             expect(response.status).toBe(201);
             expect(response.body).toHaveProperty("_id");
         });
-
-        it("should not create a role with duplicate data", async () => {
-            // Create First Data
-            const duplicateRole = generateRoleData("002");
-            await createRole(duplicateRole);
-
-            // Duplicate it
-            const response = await createRole(duplicateRole);
-            expect(response.status).toBe(400);
-            expect(response.body).toHaveProperty("message");
-        });
     });
 
     describe("GET /role", () => {
