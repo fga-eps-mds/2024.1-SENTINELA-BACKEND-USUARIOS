@@ -118,8 +118,8 @@ const updateStatusMembership = async (req, res) => {
         await newToken.save();
 
         let url;
-        if (process.env.NODE_ENV !== "deployment") {
-            url = `https://seu-dominio.com/recuperar-senha/${token}`;
+        if (process.env.NODE_ENV === "deployment") {
+            url = `${process.env.DOMINIO}/trocar-senha/${token}`;
         } else {
             url = `http://localhost:5173/trocar-senha/${token}`;
         }
