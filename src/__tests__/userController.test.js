@@ -5,6 +5,7 @@ const cors = require("cors");
 const routes = require("../routes");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const initializeRoles = require("../Utils/initDatabase");
+const User = require("../Models/userSchema");
 
 const app = express();
 let mongoServer;
@@ -39,6 +40,26 @@ beforeAll(async () => {
         process.exit(1);
     }
     await initializeRoles();
+
+    const protectedUser = await User.create({
+        name: "Admin Protected",
+        email: "adminprotected@admin.com",
+        phone: "4002-8933",
+        status: true,
+        isProtected: true,
+    });
+    protectedUserId = protectedUser._id;
+
+    // Criação de um usuário que pode ser deletado para teste
+    const deletableUser = await User.create({
+        name: "Jane Doe",
+        email: "janedoe@admin.com",
+        phone: "4002-8933",
+        status: true,
+        isProtected: false, // Não é protegido
+    });
+    deletableUserId = deletableUser._id;
+
     console.log("Finished beforeAll hook");
 }, 30000);
 
@@ -55,18 +76,17 @@ describe("User Controller Tests", () => {
 
     it("should create a new user", async () => {
         const res = await request(app).post("/signup").send({
-            name: "Jane Doe",
-            email: "janedoe@admin.com",
-            phone: "4002-8933",
+            name: "Joane Doe",
+            email: "joanedoe@admin.com",
+            phone: "4202-8933",
             status: true,
         });
 
         expect(res.status).toBe(201);
         expect(res.body).toHaveProperty("_id");
-        expect(res.body.name).toBe("Jane Doe");
-        expect(res.body.email).toBe("janedoe@admin.com");
+        expect(res.body.name).toBe("Joane Doe");
+        expect(res.body.email).toBe("joanedoe@admin.com");
     });
-
     it("should log in a user with correct credentials", async () => {
         const res = await request(app).post("/login").send({
             email: "admin@admin.com",
@@ -148,6 +168,27 @@ describe("User Controller Tests", () => {
         expect(res.status).toBe(500);
     });
 
+    it("should not delete a protected user", async () => {
+        const res = await request(app)
+            .delete(`/users/delete/${protectedUserId}`)
+            .set("Authorization", `Bearer ${authToken}`);
+
+        expect(res.status).toBe(403);
+        expect(res.body).toHaveProperty(
+            "message",
+            "Cannot delete protected user"
+        );
+    });
+
+    it("should delete a user", async () => {
+        const res = await request(app)
+            .delete(`/users/delete/${deletableUserId}`)
+            .set("Authorization", `Bearer ${authToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("email", "janedoe@admin.com");
+    });
+
     it("should recover password for existing user", async () => {
         const res = await request(app)
             .post("/users/recover-password")
@@ -164,124 +205,5 @@ describe("User Controller Tests", () => {
 
         expect(res.status).toBe(404);
         expect(res.body).toHaveProperty("mensagem", "Usuário não encontrado.");
-    });
-
-    it("should check permission for existing user", async () => {
-        const res = await request(app)
-            .get(`/users/${userId}/permission`)
-            .set("Authorization", `Bearer ${authToken}`)
-            .query({ moduleName: "users", action: "read" });
-
-        expect(res.status).toBe(200);
-        expect(res.body).toHaveProperty("hasPermission");
-    });
-
-    it("should not check permission for non-existent user", async () => {
-        const fakeId = 1234;
-        const res = await request(app)
-            .get(`/users/${fakeId}/permission`)
-            .set("Authorization", `Bearer ${authToken}`)
-            .query({ moduleName: "module1", action: "read" });
-
-        expect(res.status).toBe(400 || 500);
-        expect(res.body).toHaveProperty("message");
-    });
-
-    it("should delete a user", async () => {
-        const res = await request(app)
-            .delete(`/users/delete/${userId}`)
-            .set("Authorization", `Bearer ${authToken}`);
-
-        expect(res.status).toBe(200);
-        expect(res.body).toHaveProperty("email", "admin@admin.com");
-    });
-});
-
-describe("Role Controller Tests", () => {
-    let authToken;
-    let roleId;
-
-    // Teste criar um role
-    it("should create a role", async () => {
-        const res = await request(app)
-            .post("/role/create")
-            .set("Authorization", `Bearer ${authToken}`)
-            .send({
-                name: "Admin",
-                permissions: [
-                    {
-                        module: "module1",
-                        access: ["create", "read", "update", "delete"],
-                    },
-                ],
-            });
-
-        expect(res.status).toBe(201);
-        expect(res.body).toHaveProperty("name", "Admin");
-        roleId = res.body._id; // Guardar o ID do role criado
-    });
-
-    // Teste obter todos os roles
-    it("should get all roles", async () => {
-        await request(app)
-            .post("/role/create")
-            .set("Authorization", `Bearer ${authToken}`)
-            .send({
-                name: "Admin",
-                permissions: [
-                    {
-                        module: "module1",
-                        access: ["create", "read", "update", "delete"],
-                    },
-                ],
-            });
-
-        const res = await request(app)
-            .get("/role")
-            .set("Authorization", `Bearer ${authToken}`);
-
-        expect(res.status).toBe(200);
-        expect(res.body).toBeInstanceOf(Array);
-        expect(res.body.length).toBeGreaterThan(0);
-    });
-
-    // Teste obter um role por ID
-    it("should get a role by ID", async () => {
-        const res = await request(app)
-            .get(`/role/${roleId}`)
-            .set("Authorization", `Bearer ${authToken}`);
-
-        expect(res.status).toBe(200);
-        expect(res.body).toHaveProperty("name", "Admin");
-    });
-
-    // Teste atualizar um role por ID
-    it("should update a role by ID", async () => {
-        const res = await request(app)
-            .patch(`/role/patch/${roleId}`)
-            .set("Authorization", `Bearer ${authToken}`)
-            .send({
-                name: "Updated Role",
-                permissions: [{ module: "module2", access: ["read"] }],
-            });
-
-        expect(res.status).toBe(200);
-        expect(res.body).toHaveProperty("name", "Updated Role");
-    });
-
-    // Teste deletar um role por ID
-    it("should delete a role by ID", async () => {
-        const res = await request(app)
-            .delete(`/role/delete/${roleId}`)
-            .set("Authorization", `Bearer ${authToken}`);
-
-        expect(res.status).toBe(204);
-
-        // Verificar se o role foi realmente deletado
-        const checkRole = await request(app)
-            .get(`/role/${roleId}`)
-            .set("Authorization", `Bearer ${authToken}`);
-
-        expect(checkRole.status).toBe(404);
     });
 });

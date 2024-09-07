@@ -292,30 +292,6 @@ const changePasswordInProfile = async (req, res) => {
     }
 };
 
-const hasPermission = async (req, res) => {
-    const userId = req.params.id;
-    const { moduleName, action } = req.query; // Parâmetros na URL
-    try {
-        const user = await User.findById(userId);
-        if (!user || !user.role) {
-            return res.status(404).json({ message: "User or role not found" });
-        }
-
-        const permission = await checkPermissions(userId, moduleName, action);
-
-        if (permission) {
-            return res.status(200).json({ hasPermission: true });
-        } else {
-            return res.status(403).json({ hasPermission: false });
-        }
-    } catch (error) {
-        if (error.name === "CastError" && error.path === "_id") {
-            return res.status(400).json({ message: "Invalid user ID" });
-        }
-        return res.status(500).json({ message: error.message });
-    }
-};
-
 module.exports = {
     signUp,
     login,
@@ -326,5 +302,4 @@ module.exports = {
     recoverPassword,
     changePassword,
     changePasswordInProfile,
-    hasPermission,
 };

@@ -14,48 +14,22 @@ const OrganController = require("./Controllers/organController");
 // --user
 routes.get("/users", tokenValidation, UserController.getUsers);
 routes.get("/users/:id", tokenValidation, UserController.getUserById);
-routes.patch(
-    "/users/patch/:id",
-    checkPermissions,
-    tokenValidation,
-    UserController.patchUser
-);
-routes.delete(
-    "/users/delete/:id",
-    checkPermissions,
-    tokenValidation,
-    UserController.deleteUser
-);
+routes.patch("/users/patch/:id", tokenValidation, UserController.patchUser);
+routes.delete("/users/delete/:id", tokenValidation, UserController.deleteUser);
 
 // --roles
-routes.post("/role/create", checkPermissions, RoleController.createRole);
+routes.post("/role/create", RoleController.createRole);
 routes.get("/role", RoleController.getAllRoles);
 routes.get("/role/:id", RoleController.getRoleById);
-routes.patch(
-    "/role/patch/:id",
-    checkPermissions,
-    RoleController.updateRoleById
-);
-routes.delete(
-    "/role/delete/:id",
-    checkPermissions,
-    RoleController.deleteRoleById
-);
+routes.patch("/role/patch/:id", RoleController.updateRoleById);
+routes.delete("/role/delete/:id", RoleController.deleteRoleById);
 
 // --organ
-routes.post("/organ/create", checkPermissions, OrganController.createOrgan);
+routes.post("/organ/create", OrganController.createOrgan);
 routes.get("/organ/list", OrganController.listOrgans);
-routes.patch(
-    "/organ/update/:id",
-    checkPermissions,
-    OrganController.updateOrgan
-);
+routes.patch("/organ/update/:id", OrganController.updateOrgan);
 routes.get("/organ/get/:id", OrganController.getOrganById);
-routes.delete(
-    "/organ/delete/:id",
-    checkPermissions,
-    OrganController.deleteOrganById
-);
+routes.delete("/organ/delete/:id", OrganController.deleteOrganById);
 
 //// Public Routes (No token required)
 // --user and memberShip
@@ -74,8 +48,5 @@ routes.patch(
 );
 routes.patch("/membership/update/:id", MembershipForm.updateMembership);
 routes.get("/membership/:id", MembershipForm.getMembershipById);
-
-// --permissions
-routes.get("/users/:id/permission", UserController.hasPermission); // exemplo rota: ${baseURL}/users/1278hdfj1238j198189j/permission?moduleName=finance&action=read
 
 module.exports = routes;
