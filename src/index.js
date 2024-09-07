@@ -6,14 +6,24 @@ const initializeRoles = require("./Utils/initDatabase");
 
 const app = express();
 
-const { NODE_ENV, OFFICIAL_MONGO_URI, MONGO_URI, PORT } = process.env;
+const { NODE_ENV, OFFICIAL_MONGO_URI, MONGO_URI, PORT, FRONT_HOST } =
+    process.env;
 
-const corsOptions = {
-    origin: "*",
+// Middleware
+const corsOption = {
+    origin: (origin, callback) => {
+        const allowedOrigin = FRONT_HOST || "localhost";
+        if (origin?.includes(allowedOrigin) || origin === undefined) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 };
+
 // Aplicar o middleware CORS antes das rotas
-app.use(cors(corsOptions));
+app.use(cors(corsOption));
 
 // Middleware para parsear JSON e dados URL-encoded
 app.use(express.json());
@@ -28,7 +38,7 @@ app.get("/", (req, res) => {
 });
 
 let url;
-if (NODE_ENV === "development") {
+if (NODE_ENV !== "deployment") {
     url = MONGO_URI;
 } else {
     url = OFFICIAL_MONGO_URI;
