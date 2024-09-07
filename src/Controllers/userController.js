@@ -7,7 +7,6 @@ const {
 } = require("../Utils/token");
 const { sendEmail } = require("../Utils/email");
 const generator = require("generate-password");
-const { checkPermissions } = require("../Utils/permissions");
 const Token = require("../Models/tokenSchema");
 
 const salt = bcrypt.genSaltSync();
