@@ -4,7 +4,6 @@ const UserController = require("./Controllers/userController");
 const RoleController = require("./Controllers/roleController");
 
 const { tokenValidation } = require("./Utils/token");
-const { checkPermissions } = require("./Utils/permissions");
 
 const MembershipForm = require("./Controllers/membershipController");
 const TokenController = require("./Controllers/tokenController");
