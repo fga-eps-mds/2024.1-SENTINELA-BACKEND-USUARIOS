@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    isProtected: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 userSchema.set("toJSON", {
@@ -49,6 +53,21 @@ userSchema.set("toObject", {
         return ret;
     },
 });
+
+// userSchema.pre("save", async function (next) {
+//     if (!this.role) {
+//         try {
+
+//             const defaultRole = await Role.findOne({ name: "Usuário" });
+//             if (defaultRole) {
+//                 this.role = defaultRole._id;
+//             }
+//         } catch (error) {
+//             return next(error);
+//         }
+//     }
+//     next();
+// });
 
 const User = mongoose.model("User", userSchema);
 

@@ -48,10 +48,22 @@ const updateRoleById = async (req, res) => {
 
 const deleteRoleById = async (req, res) => {
     try {
-        const role = await Role.findByIdAndDelete(req.params.id);
+        // Encontre a role pelo ID
+        const role = await Role.findById(req.params.id);
+
         if (!role) {
             return res.status(404).json({ message: "Role not found" });
         }
+
+        // Verifique se a role é protegida
+        if (role.isProtected) {
+            return res
+                .status(403)
+                .json({ message: "Cannot delete protected role" });
+        }
+
+        // Se a role não for protegida, realize a exclusão
+        await Role.findByIdAndDelete(req.params.id);
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: error.message });

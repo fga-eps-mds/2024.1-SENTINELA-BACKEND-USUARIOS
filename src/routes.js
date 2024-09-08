@@ -2,7 +2,9 @@ const express = require("express");
 const routes = express.Router();
 const UserController = require("./Controllers/userController");
 const RoleController = require("./Controllers/roleController");
+
 const { tokenValidation } = require("./Utils/token");
+
 const MembershipForm = require("./Controllers/membershipController");
 const TokenController = require("./Controllers/tokenController");
 const OrganController = require("./Controllers/organController");
@@ -45,8 +47,5 @@ routes.patch(
 );
 routes.patch("/membership/update/:id", MembershipForm.updateMembership);
 routes.get("/membership/:id", MembershipForm.getMembershipById);
-
-// --permissions
-routes.get("/users/:id/permission", UserController.hasPermission); // exemplo rota: ${baseURL}/users/1278hdfj1238j198189j/permission?moduleName=finance&action=read
 
 module.exports = routes;

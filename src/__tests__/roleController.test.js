@@ -157,6 +157,7 @@ describe("RoleController Test Suite", () => {
         });
     });
 
+    // Novos testes adicionados para deletar role protegida
     describe("DELETE /role/:id", () => {
         it("should delete a specific role", async () => {
             const newRole = generateRoleData("004");
@@ -177,6 +178,51 @@ describe("RoleController Test Suite", () => {
                 `/role/delete/${roleId}`
             );
             expect(deleteResponse.status).toBe(500);
+        });
+
+        it("should not delete a protected role", async () => {
+            // Cria uma nova role protegida
+            const protectedRoleData = {
+                name: "Role Protegida",
+                permissions: [
+                    { module: "finance", access: ["read"] },
+                    { module: "benefits", access: ["read"] },
+                ],
+                isProtected: true,
+            };
+            const postResponse = await createRole(protectedRoleData);
+            expect(postResponse.status).toBe(201);
+            const roleId = postResponse.body._id;
+
+            // Tenta deletar a role protegida
+            const deleteResponse = await request(app).delete(
+                `/role/delete/${roleId}`
+            );
+            expect(deleteResponse.status).toBe(403);
+            expect(deleteResponse.body.message).toBe(
+                "Cannot delete protected role"
+            );
+        });
+
+        it("should delete a non-protected role", async () => {
+            // Cria uma nova role não protegida
+            const nonProtectedRoleData = {
+                name: "Role Não Protegida",
+                permissions: [
+                    { module: "users", access: ["read"] },
+                    { module: "benefits", access: ["read"] },
+                ],
+                isProtected: false,
+            };
+            const postResponse = await createRole(nonProtectedRoleData);
+            expect(postResponse.status).toBe(201);
+            const roleId = postResponse.body._id;
+
+            // Tenta deletar a role não protegida
+            const deleteResponse = await request(app).delete(
+                `/role/delete/${roleId}`
+            );
+            expect(deleteResponse.status).toBe(204);
         });
     });
 });

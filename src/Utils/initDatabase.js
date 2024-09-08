@@ -28,6 +28,7 @@ const initializeRoles = async () => {
                     access: ["create", "read", "update", "delete"],
                 },
             ],
+            isProtected: true,
         },
         {
             name: "sindicalizado",
@@ -37,6 +38,17 @@ const initializeRoles = async () => {
                     access: ["create", "read", "update", "delete"],
                 },
             ],
+            isProtected: true,
+        },
+        {
+            name: "Usuário",
+            permissions: [
+                {
+                    module: "users",
+                    access: ["read"],
+                },
+            ],
+            isProtected: true,
         },
     ];
 
@@ -73,6 +85,13 @@ const initializeRoles = async () => {
                 );
                 return;
             }
+            const userRole = await Role.findOne({ name: "Usuário" });
+            if (!userRole) {
+                console.error(
+                    'Role "Usuário" nao encontrada. Crie a role antes de acidionar o usuário'
+                );
+                return;
+            }
 
             // Verifica se o usuário administrador já existe
             const existingAdmin = await User.findOne({
@@ -89,12 +108,36 @@ const initializeRoles = async () => {
                     status: true,
                     password: hashedPassword,
                     role: adminRole._id,
+                    isProtected: true,
                 });
 
                 await adminUser.save();
                 console.log("Usuário administrador criado com sucesso.");
             } else {
                 console.log("Usuário administrador já existe.");
+            }
+
+            const ExistingSindicalizado = await User.findOne({
+                email: "user@user.com",
+            });
+            if (!ExistingSindicalizado) {
+                const hashedPassword = await bcrypt.hash("senha", salt); // Altere a senha padrão conforme necessário
+
+                // Cria o usuário administrador
+                const sindUser = new User({
+                    name: "User",
+                    email: "user@user.com",
+                    phone: "61981818181",
+                    status: true,
+                    password: hashedPassword,
+                    role: userRole,
+                    isProtected: true,
+                });
+
+                await sindUser.save();
+                console.log("Usuário sindicalizado criado com sucesso.");
+            } else {
+                console.log("Usuário sindicalizado já existe.");
             }
         } else {
             console.error("Mongoose connection is not open");

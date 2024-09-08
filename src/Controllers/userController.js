@@ -7,7 +7,6 @@ const {
 } = require("../Utils/token");
 const { sendEmail } = require("../Utils/email");
 const generator = require("generate-password");
-const { checkPermissions } = require("../Utils/permissions");
 const Token = require("../Models/tokenSchema");
 
 const salt = bcrypt.genSaltSync();
@@ -151,16 +150,27 @@ const patchUser = async (req, res) => {
         res.status(400).send(error);
     }
 };
-
 const deleteUser = async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id);
+        // Encontre o usuário pelo ID
+        const user = await User.findById(req.params.id);
+
         if (!user) {
-            return res.status(404).send();
+            return res.status(404).json({ message: "User not found" });
         }
-        res.status(200).send(user);
+
+        // Verifique se o usuário está protegido
+        if (user.isProtected) {
+            return res
+                .status(403)
+                .json({ message: "Cannot delete protected user" });
+        }
+
+        // Se o usuário não for protegido, realize a exclusão
+        await User.findByIdAndDelete(req.params.id);
+        res.status(200).json(user);
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -281,30 +291,6 @@ const changePasswordInProfile = async (req, res) => {
     }
 };
 
-const hasPermission = async (req, res) => {
-    const userId = req.params.id;
-    const { moduleName, action } = req.query; // Parâmetros na URL
-    try {
-        const user = await User.findById(userId);
-        if (!user || !user.role) {
-            return res.status(404).json({ message: "User or role not found" });
-        }
-
-        const permission = await checkPermissions(userId, moduleName, action);
-
-        if (permission) {
-            return res.status(200).json({ hasPermission: true });
-        } else {
-            return res.status(403).json({ hasPermission: false });
-        }
-    } catch (error) {
-        if (error.name === "CastError" && error.path === "_id") {
-            return res.status(400).json({ message: "Invalid user ID" });
-        }
-        return res.status(500).json({ message: error.message });
-    }
-};
-
 module.exports = {
     signUp,
     login,
@@ -315,5 +301,4 @@ module.exports = {
     recoverPassword,
     changePassword,
     changePasswordInProfile,
-    hasPermission,
 };
